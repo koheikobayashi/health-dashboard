@@ -9,6 +9,11 @@ import data
 # Plotlyのデフォルトテーマをライトモードに設定
 pio.templates.default = "plotly_white"
 
+# グラフのmargin設定
+margin = dict(l=40, r=40, t=80, b=40)
+height = 350
+
+# 1日の心拍数・呼吸数の推移
 def today_vital():
   
   today_heartrate_respiratory_df = data.today_heartrate_respiratory()
@@ -70,13 +75,13 @@ def today_vital():
     font=dict(color="black"),
     paper_bgcolor="white",
     plot_bgcolor="white",
-    margin=dict(l=40, r=40, t=80, b=40),
-    height=400, 
+    margin=margin,
+    height=height, 
   )
 
   return fig
 
-
+# 1週間の心拍数・呼吸数の推移
 def box_plot():
 
     week_heartrate_respiratory_df = data.week_heartrate_respiratory()
@@ -115,11 +120,191 @@ def box_plot():
     fig.update_layout(
         yaxis_title=f"{selected_data}",
         template="plotly_white",
-        showlegend=False
+        showlegend=False,
+        margin=margin,
+        height=height, 
+    )
+
+    return fig
+
+
+def sleep_time():
+
+    today_yesterday_sleep_active_df = data.today_yesterday_sleep_active()
+
+    today_yesterday_sleep_active_data = {
+        "カテゴリ": ["昨日", "今日"],
+        "睡眠時間": [today_yesterday_sleep_active_df.at[0, "本日の睡眠時間"], today_yesterday_sleep_active_df.at[0, "昨日の睡眠時間"]],
+        "活動時間": [today_yesterday_sleep_active_df.at[0, "本日の活動時間"], today_yesterday_sleep_active_df.at[0, "昨日の活動時間"]]
+    }
+
+    # 横棒グラフを作成
+    fig = go.Figure()
+
+    # 睡眠時間のバー
+    fig.add_trace(go.Bar(
+        x=today_yesterday_sleep_active_data["睡眠時間"],
+        y=today_yesterday_sleep_active_data["カテゴリ"],
+        orientation="h",
+        name="睡眠時間",
+        marker=dict(color="lightblue"),
+        text=today_yesterday_sleep_active_data["睡眠時間"],  # ラベルを表示
+        textposition="inside",  # ラベルを棒グラフの内側に配置
+        textfont=dict(color="white", size=14),  # ラベルの色を白に設定
+    ))
+
+    # 活動時間のバー
+    fig.add_trace(go.Bar(
+        x=today_yesterday_sleep_active_data["活動時間"],
+        y=today_yesterday_sleep_active_data["カテゴリ"],
+        orientation="h",
+        name="活動時間",
+        marker=dict(color="orange"),
+        text=today_yesterday_sleep_active_data["活動時間"],  # ラベルを表示
+    textposition="inside",  # ラベルを棒グラフの内側に配置
+    textfont=dict(color="white", size=14),  # ラベルの色を白に設定
+    ))
+
+    # レイアウトの調整
+    fig.update_layout(
+        xaxis=dict(range=[0, 9],showticklabels=False,title="活動時間(h)"),  # X軸の範囲を設定
+        yaxis=dict(title=""),
+        barmode="group",  # 並列表示に設定
+        height=200,
+        margin=dict(l=0, r=0, t=10, b=10),
+        showlegend=False,  # 凡例を非表示
+   
+    )
+
+    return fig
+
+# 一ヶ月の睡眠時間と活動時間の内訳
+def sleep_active_area():
+
+    month_yesterday_sleep_active_df = data.month_yesterday_sleep_active()
+
+    # サンプルデータ
+    dates = month_yesterday_sleep_active_df["日付"]
+    sleep_hours = month_yesterday_sleep_active_df["睡眠時間"]
+    active_hours = month_yesterday_sleep_active_df["活動時間"]
+
+    # 図の作成
+    fig = go.Figure()
+
+    # 睡眠時間のエリアチャート
+    fig.add_trace(go.Scatter(
+        x=dates,
+        y=sleep_hours,
+        mode='lines',
+        name="睡眠時間",
+        line=dict(color="skyblue"),
+        fill='tozeroy'  # Y軸のゼロから塗りつぶし
+    ))
+
+    # 活動時間のエリアチャート
+    fig.add_trace(go.Scatter(
+        x=dates,
+        y=sleep_hours + active_hours,
+        mode='lines',
+        name="活動時間",
+        line=dict(color="orange"),
+        fill='tonexty'  # 前のトレースから次のY軸まで塗りつぶし
+    ))
+
+    # レイアウトの設定
+    fig.update_layout(
+        yaxis_title="時間（h）",
+        xaxis=dict(tickformat="%m/%d"),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="left",
+            x=0
+        ),
+        margin=dict(t=20, b=20)
+    )
+    
+    fig.update_layout(
+        font=dict(color="black"),
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        margin=margin,
+        height=height, 
+    )
+    # 表示
+    return fig
+
+# よく眠れている日、そうでない日の可視化
+def sleep_heatmap():
+
+    month_yesterday_sleep_active_df = data.month_yesterday_sleep_active()
+
+    # データをピボットテーブル化
+    pivot_table = month_yesterday_sleep_active_df.pivot_table(index="週目", columns="曜日", values="睡眠時間", aggfunc="mean")
+
+    # 週目の順序を逆にする
+    pivot_table = pivot_table.loc[::-1]
+
+    # 曜日の順序を統一（スプレッドシート通り）
+    ordered_columns = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"]
+    pivot_table = pivot_table[ordered_columns]  # 列を並べ替え
+
+    # 柔らかい青系のカラースケール（灰色を含む）
+    colorscale = [
+        [0, "lightgray"],  # NaN値を灰色に設定
+        [0.01, "lightblue"],  # 最小値を薄い青に設定
+        [1, "deepskyblue"]  # 最大値を濃い青に設定
+    ]
+
+    # ヒートマップ作成
+    fig = go.Figure(data=go.Heatmap(
+        z=pivot_table.values,
+        x=pivot_table.columns,
+        y=pivot_table.index,
+        colorscale=colorscale,
+        zmin=0,  # データがある場合の最小値
+        zmax=10,  # 最大値
+        hoverongaps=False,  # NaN部分をホバーしない
+        showscale=False  # 凡例（カラーバー）を非表示
+    ))
+
+    # 各セルに数値を表示するためのテキスト
+    text_values = np.where(
+        np.isnan(pivot_table.values),  # NaNの場合は空白にする
+        "",
+        np.round(pivot_table.values, 1)  # 小数点1桁で丸める
+    )
+
+    # 数値をセルの中央に表示する
+    for i, row in enumerate(text_values):
+        for j, val in enumerate(row):
+            if val != "":  # データがあるセルのみ表示
+                fig.add_trace(go.Scatter(
+                    x=[ordered_columns[j]],
+                    y=[pivot_table.index[i]],
+                    text=str(val),
+                    mode="text",
+                    textfont=dict(
+                        size=12,
+                        color="black"
+                    ),
+                    showlegend=False,  # 凡例を非表示に設定
+                    hoverinfo="none"  # ホバー情報を非表示
+                ))
+
+    # レイアウトの調整
+    fig.update_layout(
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        font=dict(color="black"),
+        margin=margin,
+        height=height, 
     )
 
 
     return fig
+
 
 def distance_graph():
 
@@ -174,8 +359,8 @@ def distance_graph():
         font=dict(color="black"),
         paper_bgcolor="white",
         plot_bgcolor="white",
-        margin=dict(l=40, r=40, t=80, b=40),
-        height=400, 
+        margin=margin,
+        height=height, 
     )
 
     return fig
@@ -208,152 +393,13 @@ def loom_heatmap():
         font=dict(color="black"),
         paper_bgcolor="white",
         plot_bgcolor="white",
-        margin=dict(l=40, r=40, t=80, b=40),
-        height=400, 
+        margin=margin,
+        height=height, 
     )
     return fig
 
 
-def sleep_time():
 
-    data = {
-    "カテゴリ": ["昨日", "今日"],
-    "睡眠時間": [7.5, 8.5],
-    "活動時間": [4.5, 3.3]
-    }
-
-    # 横棒グラフを作成
-    fig = go.Figure()
-
-    # 睡眠時間のバー
-    fig.add_trace(go.Bar(
-        x=data["睡眠時間"],
-        y=data["カテゴリ"],
-        orientation="h",
-        name="睡眠時間",
-        marker=dict(color="lightblue"),
-        text=data["睡眠時間"],  # ラベルを表示
-    textposition="inside",  # ラベルを棒グラフの内側に配置
-    textfont=dict(color="white", size=14),  # ラベルの色を白に設定
-    ))
-
-    # 活動時間のバー
-    fig.add_trace(go.Bar(
-        x=data["活動時間"],
-        y=data["カテゴリ"],
-        orientation="h",
-        name="活動時間",
-        marker=dict(color="orange"),
-        text=data["活動時間"],  # ラベルを表示
-    textposition="inside",  # ラベルを棒グラフの内側に配置
-    textfont=dict(color="white", size=14),  # ラベルの色を白に設定
-    ))
-
-    # レイアウトの調整
-    fig.update_layout(
-        xaxis=dict(range=[0, 9],showticklabels=False,title="活動時間(h)"),  # X軸の範囲を設定
-        yaxis=dict(title=""),
-        barmode="group",  # 並列表示に設定
-        height=200,
-        margin=dict(l=0, r=0, t=10, b=10),
-        showlegend=False,  # 凡例を非表示
-   
-    )
-
-    # 表示
-    return fig
-
-
-def sleep_heatmap():
-
-    # サンプルデータ
-    dates = pd.date_range("2023-09-01", periods=30)
-    sleep_hours = np.random.uniform(5, 10, len(dates))  # 睡眠時間のサンプルデータ
-    active_hours = np.random.uniform(5, 10, len(dates))  # 活動時間のサンプルデータ
-
-    # 図の作成
-    fig = go.Figure()
-
-    # 睡眠時間のエリアチャート
-    fig.add_trace(go.Scatter(
-        x=dates,
-        y=sleep_hours,
-        mode='lines',
-        name="睡眠時間",
-        line=dict(color="skyblue"),
-        fill='tozeroy'  # Y軸のゼロから塗りつぶし
-    ))
-
-    # 活動時間のエリアチャート
-    fig.add_trace(go.Scatter(
-        x=dates,
-        y=sleep_hours + active_hours,
-        mode='lines',
-        name="活動時間",
-        line=dict(color="orange"),
-        fill='tonexty'  # 前のトレースから次のY軸まで塗りつぶし
-    ))
-
-    # レイアウトの設定
-    fig.update_layout(
-        yaxis_title="時間（h）",
-        xaxis=dict(tickformat="%m/%d"),
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="left",
-            x=0
-        ),
-        margin=dict(t=20, b=20)
-    )
-    
-    fig.update_layout(
-        font=dict(color="black"),
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        margin=dict(l=40, r=40, t=80, b=40),
-        height=400, 
-    )
-    # 表示
-    return fig
-
-def sleep_heatmap2():
-
-    # サンプルデータの作成
-    weeks = ["1w", "2w", "3w", "4w", "5w", "6w"]
-    days = ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日"]
-
-    # ランダムなデータを生成（ヒートマップの値）
-    data = np.random.randint(0, 10, size=(len(weeks), len(days)))
-
-    # ヒートマップの作成
-    fig = go.Figure(data=go.Heatmap(
-        z=data,
-        x=days,
-        y=weeks,
-        colorscale='Blues',  # 青系のカラースケール
-        colorbar=dict(title="値")
-    ))
-
-    # レイアウトの調整
-    fig.update_layout(
-        yaxis_title="週",
-        xaxis=dict(tickmode="array", tickvals=list(range(len(days))), ticktext=days),
-        yaxis=dict(tickmode="array", tickvals=list(range(len(weeks))), ticktext=weeks),
-        margin=dict(t=30, b=30, l=30, r=30)
-    )
-
-    fig.update_layout(
-        font=dict(color="black"),
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        margin=dict(l=40, r=40, t=80, b=40),
-        height=300, 
-    )
-
-    # 表示
-    return fig
 
 def fall_down():
         # データの準備

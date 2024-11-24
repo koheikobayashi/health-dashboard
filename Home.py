@@ -171,6 +171,11 @@ real_time_respiratory_rate = data.real_time_respiratory_rate()
 
 respiratory_increase_decrease = data.respiratory_increase_decrease()
 
+today_wakeup_time = data.today_wakeup_time()
+
+today_sleep_time = data.today_sleep_time()
+
+
 # 3つのカラムを作成
 col1, col2, col3 = st.columns(3)
 
@@ -210,9 +215,9 @@ with col2:
     # 起床時間と就寝時間（左）
     with column_1:
         display_center_text("本日の起床時間")
-        display_large_number("6:32", "")
+        display_large_number(today_wakeup_time, "")
         display_center_text("本日の就寝時間")
-        display_large_number("21:32", "")
+        display_large_number(today_sleep_time, "")
 
     # 睡眠時間・活動時間のグラフ（右）
     with column_2:
@@ -223,11 +228,11 @@ with col2:
 
     # グラフの表示
     display_center_text("一ヶ月の睡眠時間と活動時間の内訳")
-    fig4 = graph.sleep_heatmap()
+    fig4 = graph.sleep_active_area()
     st.plotly_chart(fig4,use_container_width=True,config={"displayModeBar": False})
 
     display_center_text("よく眠れている日、そうでない日の可視化")
-    fig5 = graph.sleep_heatmap2()
+    fig5 = graph.sleep_heatmap()
     st.plotly_chart(fig5,use_container_width=True,config={"displayModeBar": False})
 
 # ---------------------------
