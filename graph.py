@@ -16,81 +16,87 @@ height = 350
 # 1日の心拍数・呼吸数の推移
 def today_vital():
   
-  today_heartrate_respiratory_df = data.today_heartrate_respiratory()
+    today_heartrate_respiratory_df = data.today_heartrate_respiratory()
 
-  time = today_heartrate_respiratory_df["時間"]
-  respiration_rate = today_heartrate_respiratory_df["呼吸数"]  # 呼吸数データ
-  heart_rate = today_heartrate_respiratory_df["心拍数"]  # 心拍数データ
+    time = today_heartrate_respiratory_df["時間"]
+    respiration_rate = today_heartrate_respiratory_df["呼吸数"]  # 呼吸数データ
+    heart_rate = today_heartrate_respiratory_df["心拍数"]  # 心拍数データ
 
-  # 各データの平均値
-  avg_respiration = np.mean(respiration_rate)
-  avg_heart_rate = np.mean(heart_rate)
+    # 各データの平均値
+    avg_respiration = np.mean(respiration_rate)
+    avg_heart_rate = np.mean(heart_rate)
 
-  # 図の作成
-  fig = go.Figure()
+    # 図の作成
+    fig = go.Figure()
 
-  # 呼吸数のプロット
-  fig.add_trace(go.Scatter(
-      x=time, y=respiration_rate,
-      mode="lines+markers+text",
-      name="呼吸数",
-      line=dict(color="skyblue", width=4),
-      marker=dict(size=8, color="skyblue"),
-      text=[f"{int(y)}" if y == max(respiration_rate) else "" for y in respiration_rate], # 最大値に表示
-      textposition="top center",
-  ))
+    # 呼吸数のプロット
+    fig.add_trace(go.Scatter(
+        x=time, y=respiration_rate,
+        mode="lines+markers+text",
+        name="呼吸数",
+        line=dict(color="skyblue", width=4),
+        marker=dict(size=8, color="skyblue"),
+        text=[f"{int(y)}" if y == max(respiration_rate) else "" for y in respiration_rate], # 最大値に表示
+        textposition="top center",
+    ))
 
-  # 心拍数のプロット
-  fig.add_trace(go.Scatter(
-      x=time, y=heart_rate,
-      mode="lines+markers+text",
-      name="心拍数",
-      line=dict(color="orange", width=4),
-      marker=dict(size=8, color="orange"),
-      text=[f"{int(y)}" if y == max(heart_rate) else "" for y in heart_rate], # 最大値に表示
-      textposition="top center",
-  ))
+    # 心拍数のプロット
+    fig.add_trace(go.Scatter(
+        x=time, y=heart_rate,
+        mode="lines+markers+text",
+        name="心拍数",
+        line=dict(color="orange", width=4),
+        marker=dict(size=8, color="orange"),
+        text=[f"{int(y)}" if y == max(heart_rate) else "" for y in heart_rate], # 最大値に表示
+        textposition="top center",
+    ))
 
-  # 平均線の追加
-  fig.add_hline(y=avg_respiration, line=dict(color="skyblue", dash="dash"))
-  fig.add_hline(y=avg_heart_rate, line=dict(color="orange", dash="dash"))
+    # 平均線の追加
+    fig.add_hline(y=avg_respiration, line=dict(color="skyblue", dash="dash"))
+    fig.add_hline(y=avg_heart_rate, line=dict(color="orange", dash="dash"))
 
-  # 平均値のラベル
-  fig.add_annotation(
-      xref="paper", y=avg_respiration, x=1.02, yanchor="middle",
-      text=f"(平均) {avg_respiration:.1f}", showarrow=False, font=dict(color="skyblue")
-  )
-  fig.add_annotation(
-      xref="paper", y=avg_heart_rate, x=1.02, yanchor="middle",
-      text=f"(平均) {avg_heart_rate:.1f}", showarrow=False, font=dict(color="orange")
-  )
+    # 平均値のラベル
+    fig.add_annotation(
+        xref="paper", y=avg_respiration, x=1.02, yanchor="middle",
+        text=f"(平均) {avg_respiration:.1f}", showarrow=False, font=dict(color="skyblue")
+    )
+    fig.add_annotation(
+        xref="paper", y=avg_heart_rate, x=1.02, yanchor="middle",
+        text=f"(平均) {avg_heart_rate:.1f}", showarrow=False, font=dict(color="orange")
+    )
 
-  # レイアウトの設定
-  fig.update_layout(
-      xaxis=dict(tickmode='linear', tick0=0, dtick=1),
-      legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
-  )
+    # レイアウトの設定
+    fig.update_layout(
+        xaxis=dict(tickmode='linear', tick0=0, dtick=1),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
+    )
 
-  fig.update_layout(
-    font=dict(color="black"),
-    paper_bgcolor="white",
-    plot_bgcolor="white",
-    margin=margin,
-    height=height, 
-  )
+    fig.update_layout(
+        font=dict(color="black"),
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        margin=margin,
+        height=height, 
+    )
 
-  return fig
+    return fig
+
 
 # 1週間の心拍数・呼吸数の推移
 def box_plot():
+
+    # ユニークなキーを生成するために、必要に応じて識別子を使用します
+    unique_key = 'selectbox_unique_identifier'  # 他のウィジェットと被らないように適宜変更
 
     week_heartrate_respiratory_df = data.week_heartrate_respiratory()
 
     selected_data = st.selectbox(
         "",
         options=["心拍数", "呼吸数"],
-        index=0  # デフォルトは心拍数
+        index=0,  # デフォルトは心拍数
+        key=unique_key  # ユニークなキーを指定
     )
+
     # 選択されたデータに基づき、関連列を抽出
     columns_mapping = {
         "心拍数": ["心拍数最小値", "心拍数Q1", "心拍数中央値", "心拍数Q3", "心拍数最大値"],
@@ -126,6 +132,7 @@ def box_plot():
     )
 
     return fig
+
 
 
 def sleep_time():
@@ -308,10 +315,11 @@ def sleep_heatmap():
 
 def distance_graph():
 
+    bet_in_out_distance_df = data.bet_in_out_distance()
     # サンプルデータ
-    time_labels = [f"{hour}:00" for hour in range(24)]  # 0:00から23:00までの時刻
-    bed_inside = np.random.uniform(0, 1200, 24)  # ベッド内移動距離のサンプルデータ
-    bed_outside = np.random.uniform(0, 3000, 24) # ベッド外移動距離のサンプルデータ
+    time_labels = bet_in_out_distance_df["時刻"]  # 0:00から23:00までの時刻
+    bed_inside = bet_in_out_distance_df["ベッド内移動距離"]  # ベッド内移動距離のサンプルデータ
+    bed_outside = bet_in_out_distance_df["ベッド外移動距離"] # ベッド外移動距離のサンプルデータ
 
     # 最大値を取得
     max_bed_inside = max(bed_inside)
@@ -365,117 +373,114 @@ def distance_graph():
 
     return fig
 
-def loom_heatmap():
+def room_heatmap():
 
-    # サンプルデータの作成
-    dates = pd.date_range("2023-09-01", periods=11).strftime('%m/%d')  # 9月1日から9月11日
-    hours = list(range(1, 25))  # 1時から24時
+    week_room_in_out_df = data.week_room_in_out()
 
-    # ヒートマップの値をランダムに生成
-    data = np.random.rand(len(dates), len(hours)) * 100
+    # ピボットテーブルの作成（行：日付、列：時刻）
+    pivot_table = week_room_in_out_df.pivot(index="日付_再調整", columns="時刻", values="入退室数")
+
+    # 週目の順序を逆にする
+    pivot_table = pivot_table.loc[::-1]
 
     # ヒートマップの作成
     fig = go.Figure(data=go.Heatmap(
-        z=data,
-        x=hours,
-        y=dates,
+        z=pivot_table.values,
+        x=pivot_table.columns,
+        y=pivot_table.index,
         colorscale='Greys',  # カラースケールをグレーに設定
-        colorbar=dict(title="値")
+        colorbar=dict(title="入退室数"),
+        showscale=False  # 凡例（カラーバー）を非表示
     ))
 
     # レイアウトの調整
     fig.update_layout(
         xaxis_title="時間(h）",
         xaxis_nticks=24,  # x軸を24区切りに
-    )
-
-    fig.update_layout(
         font=dict(color="black"),
         paper_bgcolor="white",
         plot_bgcolor="white",
         margin=margin,
-        height=height, 
+        height=height
     )
+
     return fig
-
-
 
 
 def fall_down():
-        # データの準備
-    # ヒートマップ用データ
-    heatmap_data = pd.DataFrame(
-        {
-            0: [1, 2, 1, 1, 1, 1],
-            1: [1, 1, 1, 2, 1, 1],
-            2: [1, 1, 4, 1, 1, 1],
-            3: [1, 1, 1, 1, 2, 1],
-            4: [1, 1, 1, 1, 7, 1],
-            5: [1, 1, 1, 1, 1, 1],
-        },
-        index=["1w", "2w", "3w", "4w", "5w", "6w"],
+    
+    fall_down_df = data.fall_down()
+    # データをピボットテーブル化
+    pivot_table = fall_down_df.pivot_table(index="週目", columns="曜日", values="転倒検知", aggfunc="mean")
+
+    # 週目の順序を逆にする
+    pivot_table = pivot_table.loc[::-1]
+
+    # 曜日の順序を統一（スプレッドシート通り）
+    ordered_columns = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"]
+    pivot_table = pivot_table[ordered_columns]  # 列を並べ替え
+
+    # カラースケールの定義（YlOrRdベース、NaNは灰色）
+    colorscale = [
+        [0, "lightgray"],  # NaN値を灰色に設定
+        [0.01, "rgb(255,255,204)"],  # YlOrRdの最小値
+        [0.5, "rgb(252,141,89)"],   # 中間値
+        [1, "rgb(215,48,39)"]       # 最大値
+    ]
+
+    # ヒートマップ作成
+    fig = go.Figure(data=go.Heatmap(
+        z=pivot_table.values,
+        x=pivot_table.columns,
+        y=pivot_table.index,
+        colorscale=colorscale,
+        zmin=0,  # データがある場合の最小値
+        zmax=10,  # 最大値
+        hoverongaps=False,  # NaN部分をホバーしない
+        showscale=False  # 凡例（カラーバー）を非表示
+    ))
+
+    # 各セルに数値を表示するためのテキスト
+    text_values = np.where(
+        np.isnan(pivot_table.values),  # NaNの場合は空白にする
+        "",
+        pivot_table.values.astype(int)  # 小数点1桁で丸める
     )
 
-    fig = px.imshow(
-        heatmap_data,
-        text_auto=True,
-        color_continuous_scale="YlOrRd",
-        labels={"color": "回数"},
-    )
+    # 数値をセルの中央に表示する
+    for i, row in enumerate(text_values):
+        for j, val in enumerate(row):
+            if val != "":  # データがあるセルのみ表示
+                fig.add_trace(go.Scatter(
+                    x=[ordered_columns[j]],
+                    y=[pivot_table.index[i]],
+                    text=str(val),
+                    mode="text",
+                    textfont=dict(
+                        size=12,
+                        color="black"
+                    ),
+                    showlegend=False,  # 凡例を非表示に設定
+                    hoverinfo="none"  # ホバー情報を非表示
+                ))
+
+    # レイアウトの調整
     fig.update_layout(
-        yaxis_title="週",
-        coloraxis_showscale=False,
-        margin=dict(l=20, r=20, t=40, b=20),
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        font=dict(color="black"),
+        margin=margin,
+        height=height, 
     )
 
     return fig
 
+
 def anomaly_detect():
 
-    # ログ用データ
-    log_data = pd.DataFrame(
-        {
-            "時刻": [
-                "2024/09/30 21:10",
-                "2024/09/29 16:27",
-                "2024/09/28 05:45",
-                "2024/09/27 13:15",
-                "2024/09/26 23:50",
-                "2024/09/25 08:25",
-                "2024/09/24 17:12",
-                "2024/09/23 02:05",
-                "2024/09/22 14:35",
-                "2024/09/21 06:55",
-            ],
-            "危険度": ["注意", "危険", "注意", "注意", "危険", "危険", "危険", "注意", "注意", "危険"],
-            "アラート内容": [
-                "頻脈",
-                "無呼吸",
-                "夜中の移動",
-                "頻呼吸",
-                "転倒",
-                "頻脈",
-                "無呼吸",
-                "夜中の移動",
-                "頻呼吸",
-                "転倒",
-            ],
-            "アラートメッセージ": [
-                "心拍数が上昇傾向です。体調を観察してください。",
-                "無呼吸が頻発しています。至急医療対応が必要です。",
-                "早朝に施設内を移動していました。見守りを強化してください。",
-                "呼吸数が通常より高いです。安静にしてください。",
-                "就寝前に転倒を検知しました。怪我の確認をお願いします。",
-                "心拍数が非常に高いです。緊急対応を行ってください。",
-                "複数回の無呼吸を検知しました。医師の診察が必要です。",
-                "夜間の移動を検知しました。見守りをお願いします。",
-                "呼吸数が増加しています。体調を確認してください。",
-                "起床時に転倒を検知しました。対応をお願いします。",
-            ],
-        }
-    )
+    alert_log_df = data.alert_log()
 
-    styled_log_data = log_data.style.apply(highlight_danger, axis=1)
+    styled_log_data = alert_log_df.style.apply(highlight_danger, axis=1)
     st.dataframe(styled_log_data, height=400, width=700)
 
 def highlight_danger(row):

@@ -161,7 +161,6 @@ def display_large_number(number, percentage):
 # ---------------------------
 
 # ダミーデータの設定
-test_percentage = "15.58%"
 
 real_time_heart_rate = data.real_time_heart_rate()
 
@@ -174,6 +173,14 @@ respiratory_increase_decrease = data.respiratory_increase_decrease()
 today_wakeup_time = data.today_wakeup_time()
 
 today_sleep_time = data.today_sleep_time()
+
+today_room = data.today_room()
+
+today_yesterday_room = data.today_yesterday_room()
+
+today_move = data.today_move()
+
+today_yesterday_move = data.today_yesterday_move()
 
 
 # 3つのカラムを作成
@@ -202,8 +209,9 @@ with col1:
     st.plotly_chart(fig1,use_container_width=True,config={"displayModeBar": False})
 
     display_center_text("1週間の心拍数・呼吸数の推移")
-    fig2 = graph.box_plot()
-    st.plotly_chart(fig2,use_container_width=True,config={"displayModeBar": False})
+    with st.container():
+        fig2 = graph.box_plot()
+        st.plotly_chart(fig2,use_container_width=True,config={"displayModeBar": False})
 
 # ---------------------------
 # カラム2：睡眠・活動時間
@@ -245,20 +253,20 @@ with col3:
     # 本日の入退室数（左）
     with column_1:
         display_center_text("本日の入退室数")
-        display_large_number('16<span class="small-text"> 回</span>', test_percentage)
+        display_large_number(f'{today_room}<span class="small-text"> 回</span>', str(today_yesterday_room)+"%")
 
     # 本日の移動距離（右）
     with column_2:
         display_center_text("本日の移動距離")
-        display_large_number('121<span class="small-text"> m</span>', test_percentage)
+        display_large_number(f'{today_move}<span class="small-text"> m</span>', str(today_yesterday_move)+"%")
 
     # グラフの表示
-    display_center_text("今日の移動距離の内訳")
+    display_center_text("本日の移動距離の内訳")
     fig6 = graph.distance_graph()
     st.plotly_chart(fig6,use_container_width=True,config={"displayModeBar": False})
 
     display_center_text("入退室の多い日・時刻")
-    fig7 = graph.loom_heatmap()
+    fig7 = graph.room_heatmap()
     st.plotly_chart(fig7,use_container_width=True,config={"displayModeBar": False})
 
 
