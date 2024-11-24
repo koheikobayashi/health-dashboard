@@ -10,7 +10,7 @@ import data
 pio.templates.default = "plotly_white"
 
 # グラフのmargin設定
-margin = dict(l=40, r=40, t=80, b=40)
+margin = dict(l=40, r=20, t=40, b=40)
 height = 350
 
 # 1日の心拍数・呼吸数の推移
