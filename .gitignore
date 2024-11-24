@@ -1,1 +1,4 @@
 health-dashboard/
+test.ipynb
+__pycache__/
+.gitignore
