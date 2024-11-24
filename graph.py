@@ -277,7 +277,7 @@ def sleep_heatmap():
         [0.01, "lightblue"],
         [1, "deepskyblue"]
     ]
-    fig = create_heatmap(df, "睡眠時間", "睡眠時間ヒートマップ", colorscale, zmax=10)
+    fig = create_heatmap(df, "睡眠時間", "", colorscale, zmax=10)
     return fig
 
 def fall_down_heatmap():
