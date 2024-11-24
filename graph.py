@@ -4,15 +4,18 @@ import pandas as pd
 import plotly.express as px
 import plotly.io as pio
 import streamlit as st
+import data
 
 # Plotlyのデフォルトテーマをライトモードに設定
 pio.templates.default = "plotly_white"
 
 def today_vital():
-  # サンプルデータ
-  time = [f"{hour}:00" for hour in range(1, 24)]
-  respiration_rate = np.random.normal(20, 5, 23).clip(10, 30)  # 呼吸数データ
-  heart_rate = np.random.normal(80, 15, 23).clip(60, 120)  # 心拍数データ
+  
+  today_heartrate_respiratory_df = data.today_heartrate_respiratory()
+
+  time = today_heartrate_respiratory_df["時間"]
+  respiration_rate = today_heartrate_respiratory_df["呼吸数"]  # 呼吸数データ
+  heart_rate = today_heartrate_respiratory_df["心拍数"]  # 心拍数データ
 
   # 各データの平均値
   avg_respiration = np.mean(respiration_rate)
@@ -75,38 +78,48 @@ def today_vital():
 
 
 def box_plot():
-  # サンプルデータを生成
-  np.random.seed(42)
-  dates = ["8/18", "8/19", "8/20", "8/21", "8/22", "8/23"]
-  data = {date: np.random.normal(85, 5, 100) for date in dates}
 
-  # ボックスプロットのデータを準備
-  fig = go.Figure()
+    week_heartrate_respiratory_df = data.week_heartrate_respiratory()
 
-  for date, values in data.items():
-      fig.add_trace(go.Box(
-          y=values,
-          name=date,
-          boxpoints=False,  # 外れ値のポイントを非表示
-          marker_color='skyblue',  # ボックスの色
-          line=dict(color='lightblue')  # ラインの色
-      ))
+    selected_data = st.selectbox(
+        "",
+        options=["心拍数", "呼吸数"],
+        index=0  # デフォルトは心拍数
+    )
+    # 選択されたデータに基づき、関連列を抽出
+    columns_mapping = {
+        "心拍数": ["心拍数最小値", "心拍数Q1", "心拍数中央値", "心拍数Q3", "心拍数最大値"],
+        "呼吸数": ["呼吸数最小値", "呼吸数Q1", "呼吸数中央値", "呼吸数Q3", "呼吸数最大値"]
+    }
+    selected_columns = columns_mapping[selected_data]
 
-  # レイアウト設定
-  fig.update_layout(
-      yaxis=dict(range=[65, 100]),  # Y軸の範囲を画像と同様に設定
-      showlegend=False
-  )
+    # Plotlyでボックスプロットを作成
+    fig = go.Figure()
 
-  fig.update_layout(
-    font=dict(color="black"),
-    paper_bgcolor="white",
-    plot_bgcolor="white",
-    margin=dict(l=40, r=40, t=80, b=40),
-    height=400, 
-  )
+    for i, date in enumerate(week_heartrate_respiratory_df["日付"]):
+        fig.add_trace(
+            go.Box(
+                y=[
+                    week_heartrate_respiratory_df.loc[i, selected_columns[0]],  # 最小値
+                    week_heartrate_respiratory_df.loc[i, selected_columns[1]],  # Q1
+                    week_heartrate_respiratory_df.loc[i, selected_columns[2]],  # 中央値
+                    week_heartrate_respiratory_df.loc[i, selected_columns[3]],  # Q3
+                    week_heartrate_respiratory_df.loc[i, selected_columns[4]]   # 最大値
+                ],
+                name=date,
+                marker_color="pink" if selected_data == "心拍数" else "lightblue"
+            )
+        )
 
-  return fig
+    # レイアウト設定
+    fig.update_layout(
+        yaxis_title=f"{selected_data}",
+        template="plotly_white",
+        showlegend=False
+    )
+
+
+    return fig
 
 def distance_graph():
 

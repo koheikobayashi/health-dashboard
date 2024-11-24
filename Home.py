@@ -3,6 +3,7 @@ import pandas as pd
 import graph
 import data
 
+
 # ページの設定
 st.set_page_config(page_title="Sales Dashboard", page_icon=":bar_chart:", layout="wide")
 
@@ -164,6 +165,12 @@ test_percentage = "15.58%"
 
 real_time_heart_rate = data.real_time_heart_rate()
 
+heart_rate_increase_decrease = data.heart_rate_increase_decrease()
+
+real_time_respiratory_rate = data.real_time_respiratory_rate()
+
+respiratory_increase_decrease = data.respiratory_increase_decrease()
+
 # 3つのカラムを作成
 col1, col2, col3 = st.columns(3)
 
@@ -177,19 +184,19 @@ with col1:
     # リアルタイムの心拍数（左）
     with column_1:
         display_center_text("リアルタイムの心拍数")
-        display_large_number(real_time_heart_rate, test_percentage)
+        display_large_number(real_time_heart_rate, str(heart_rate_increase_decrease)+"%")
 
     # リアルタイムの心拍数（右）
     with column_2:
-        display_center_text("リアルタイムの心拍数")
-        display_large_number("100", test_percentage)
+        display_center_text("リアルタイムの呼吸数")
+        display_large_number(real_time_respiratory_rate, str(respiratory_increase_decrease)+"%")
 
     # グラフの表示
-    display_center_text("一週間の心拍数の最大値、最小値")
+    display_center_text("1日の心拍数・呼吸数の推移")
     fig1 = graph.today_vital()
     st.plotly_chart(fig1,use_container_width=True,config={"displayModeBar": False})
 
-    display_center_text("一日の心拍数・呼吸数の推移")
+    display_center_text("1週間の心拍数・呼吸数の推移")
     fig2 = graph.box_plot()
     st.plotly_chart(fig2,use_container_width=True,config={"displayModeBar": False})
 
