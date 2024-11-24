@@ -241,20 +241,21 @@ with col3:
 # ---------------------------
 # 転倒・異常検知
 # ---------------------------
-st.markdown(f"""
-<div style="background-color: #54B45E;" class="styled-header2">転倒・異常検知</div>
-""", unsafe_allow_html=True)
+with st.container():
+    st.markdown(f"""
+    <div style="background-color: #54B45E;" class="styled-header2">転倒・異常検知</div>
+    """, unsafe_allow_html=True)
+    # レイアウトを左右2列に分割
+    col1, col2 = st.columns([1, 1])  # 左右の比率を1:1に設定
 
-# レイアウトを左右2列に分割
-col_left, col_right = st.columns(2)
+    # 左列: Plotlyでヒートマップを作成
+    with col1:
+        display_center_text("転倒検知した日、回数")
+        fig7 = graph.fall_down_heatmap()
+        st.plotly_chart(fig7, use_container_width=True,config={"displayModeBar": False})
 
-# 左列: 転倒検知ヒートマップ
-with col_left:
-    display_center_text("転倒検知した日、回数")
-    fig8 = graph.fall_down_heatmap()
-    st.plotly_chart(fig8, use_container_width=True, config={"displayModeBar": False})
-
-# 右列: 異常検知ログ
-with col_right:
-    display_center_text("異常検知ログ")
-    graph.anomaly_detect()
+    # 右列: 異常検知ログを表示
+    with col2:
+        display_center_text("異常検知ログ")
+        # 各行の背景色を危険度で設定
+        graph.anomaly_detect()
