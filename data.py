@@ -101,7 +101,7 @@ def bet_in_out_distance():
 
 # 入退室の多い日・時刻
 def week_room_in_out():
-    week_room_in_out_df["日付_再調整"] = pd.to_datetime(week_room_in_out_df["日付"]).dt.strftime("%m月%d日")
+    week_room_in_out_df["日付_再調整"] = pd.to_datetime(week_room_in_out_df["日付"]).dt.strftime("%-m月%d日")
     return week_room_in_out_df
 
 
