@@ -9,7 +9,7 @@ python -m venv health-dashboard
 （Macの場合）source health-dashboard/bin/activate
 （Windowsの場合）health-dashboard\Scripts\activate
 pip install -r requirements.txt
-streamlit run Home.py
+streamlit run Staff.py
 
 
 # セキュリティリスクの件

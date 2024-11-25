@@ -84,12 +84,12 @@ div[data-testid="stVerticalBlockBorderWrapper"]{
     flex: 1 1 calc(33.33% - 1rem) !important;
     background-color: #FAFAFA;
 }
-@media (max-width: 1500px) {
+@media (max-width: 1700px) {
     [data-testid="stColumn"] {
         width: calc(33.33% - 1rem) !important;
     }
 }
-@media (max-width: 1350px) {
+@media (max-width: 1550px) {
     [data-testid="stColumn"] {
         width: calc(50% - 1rem) !important;
     }

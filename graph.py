@@ -387,3 +387,109 @@ def highlight_danger(row):
     危険度が「危険」の場合に行をハイライトする関数
     """
     return ['background-color: lightcoral' if row["危険度"] == "危険" else '' for _ in row]
+
+
+def heartrate_gauge():
+        # データ設定
+    current_value = 110  # 現在の値
+    max_value = 150      # 最大値
+
+    # Plotlyでドーナツ型ゲージを作成
+    fig = go.Figure(go.Pie(
+        values=[current_value, max_value - current_value],  # 現在値と残りの値
+        labels=[f"{current_value}", f"{max_value}"],  # ラベルを表示
+        hole=0.7,  # ドーナツ型の中央の大きさ
+        textinfo='none',  # テキスト情報を非表示（中心部に大きく表示させるため）
+        marker=dict(colors=['pink', 'lightgray'])  # 色設定
+    ))
+
+    # 中央のテキスト
+    fig.add_trace(go.Scatter(
+        x=[0], y=[0],  # 中央の位置
+        text=[f"<b>{current_value}</b>"],  # 表示する値
+        mode='text',
+        textfont=dict(size=40, color='black')  # フォントサイズと色
+    ))
+
+    # レイアウト設定
+    fig.update_layout(
+        showlegend=False,  # 凡例を非表示
+        margin=dict(t=0, b=0, l=0, r=0),  # マージン設定
+        paper_bgcolor="white"  # 背景色
+    )
+
+    return fig
+
+
+def rader_chart():
+    # データの定義
+    categories = ["睡眠時間", "活動時間", "睡眠リズム", "バイタルパターン"]  # カテゴリ名
+    values = [4, 3, 5, 4]  # 各カテゴリの値
+
+    # レーダーチャート用のデータを作成
+    values += values[:1]  # 閉じるために最初の値を最後に追加
+    categories += categories[:1]  # 閉じるために最初のカテゴリ名を最後に追加
+
+    # レーダーチャートを作成
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatterpolar(
+        r=values,
+        theta=categories,
+        fill='toself',  # エリアを塗りつぶす
+        name='データ',
+        line=dict(color="deepskyblue"),
+        fillcolor="rgba(135,206,250,0.5)",  # 半透明の青色
+        marker=dict(size=6)  # 点のサイズ
+    ))
+
+    # レイアウトを設定
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 5],  # 値の範囲を0～5に設定
+                tickvals=[1, 2, 3, 4, 5],  # ラベルを設定
+                tickfont=dict(size=10)  # フォントサイズ
+            )
+        ),
+        showlegend=False,  # 凡例を非表示
+        margin=dict(t=40, b=20, l=40, r=40),
+        height=400,
+        title=dict(text="バイタルパターン", font=dict(size=16))
+    )
+    return fig
+
+
+def donut_chart():
+    
+    # データ定義
+    labels = ["部屋", "就寝", "外出", "ベット内"]
+    values = [55, 30, 10, 5]
+
+    # カラースケール
+    colors = ["skyblue", "darkblue", "orange", "limegreen"]
+
+    # ドーナツチャートを作成
+    fig = go.Figure(data=[go.Pie(
+        labels=labels,
+        values=values,
+        hole=0.6,  # ドーナツチャートの中心穴のサイズ
+        marker=dict(colors=colors),
+        textinfo='percent+label',  # ラベルとパーセンテージを表示
+        textposition='outside',  # ラベルを円の外側に表示
+        showlegend=False  # 凡例を非表示
+    )])
+
+    # レイアウトの調整
+    fig.update_layout(
+        margin=dict(t=20, b=20, l=20, r=20),
+        height=400,
+        annotations=[
+            dict(
+                text="総合",
+                x=0.5, y=0.5, font_size=20, showarrow=False  # 中心にテキストを追加
+            )
+        ]
+    )
+    return fig
