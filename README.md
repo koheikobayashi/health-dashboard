@@ -13,4 +13,5 @@ streamlit run Staff.py
 
 
 # セキュリティリスクの件
-unsafe_allow_htmlの使用理由
+* cssでレスポンシブデザインを設定するとき、streamlitでは他のwebフレームワークのようにHTML内でstyle.cssを読み込むことができず、「st.markdown(custom_css, unsafe_allow_html=True)」のようにスクリプト中でcssを読み込みます。
+* その際のオプションで「unsafe_allow_html=True」を設定する必要があるのですが、これを設定するとサニタイズが無効となり、XSSなどのセキュリティリスクが発生します。

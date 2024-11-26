@@ -4,7 +4,7 @@ import graph
 from healthdata import HealthData
 
 # ページの設定
-st.set_page_config(page_title="Health Dashboard", page_icon=":bar_chart:", layout="wide")
+st.set_page_config(page_title="スタッフ様用レイアウト", page_icon=":bar_chart:", layout="wide")
 
 # カスタムCSSの定義
 custom_css = """
