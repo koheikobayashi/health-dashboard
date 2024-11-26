@@ -94,7 +94,7 @@ div[data-testid="stVerticalBlockBorderWrapper"]{
         width: calc(50% - 1rem) !important;
     }
 }
-@media (max-width: 900px) {
+@media (max-width: 1070px) {
     [data-testid="stColumn"] {
         width: calc(100% - 1rem) !important;
     }
