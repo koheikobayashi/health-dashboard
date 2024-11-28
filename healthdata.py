@@ -64,6 +64,12 @@ class HealthData:
         self.rader_chart_df = pd.read_csv(
             os.path.join(data_dir, "rader-chart.csv"), encoding='utf-8-sig'
         )
+        self.donut_chart_df = pd.read_csv(
+            os.path.join(data_dir, "donut-chart.csv"), encoding='utf-8-sig'
+        )
+        self.today_wakeup_active_time_df = pd.read_csv(
+            os.path.join(data_dir, "today-wakeup-active-time.csv"), encoding='utf-8-sig'
+        )
 
     
 
@@ -190,11 +196,18 @@ class HealthData:
     def sleep_and_active_heatmap(self):
         return self.sleep_and_active_heatmap_df
     
-
-    # rader_chart
+    # 睡眠時間と活動時間の推移
     def past_week_sleep_time(self):
         return self.past_week_sleep_time_df
     
     # レーダーチャート
     def rader_chart(self):
         return self.rader_chart_df
+    
+    # ドーナツチャート
+    def donut_chart(self):
+        return self.donut_chart_df
+    
+    # 起床時間、活動時間
+    def today_wakeup_active_time(self):
+        return self.today_wakeup_active_time_df

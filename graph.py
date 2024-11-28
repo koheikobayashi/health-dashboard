@@ -5,6 +5,7 @@ import plotly.io as pio
 import streamlit as st
 from healthdata import HealthData
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 # Plotlyのデフォルトテーマをライトモードに設定
 pio.templates.default = "plotly_white"
@@ -395,7 +396,7 @@ def highlight_danger(row):
 
 def heartrate_gauge():
         # データ設定
-    current_value = 110  # 現在の値
+    current_value = data.get_real_time_heart_rate()
     max_value = 150      # 最大値
 
     # Plotlyでドーナツ型ゲージを作成
@@ -437,40 +438,80 @@ def heartrate_gauge():
     return fig
 
 
-def sleep_and_active_heatmap():
-    # サンプルデータの作成
-    dates = ["9/1", "9/2", "9/3", "9/4", "9/5", "9/6"]
-    hours = list(range(24))  # 0時から23時まで
-    data = np.random.choice([0, 1, 2], size=(len(dates), len(hours)), p=[0.6, 0.3, 0.1])
+def sleep_or_active_heatmap():
 
-    # データフレーム化
-    df = pd.DataFrame(data, index=dates, columns=hours)
+    df = data.sleep_and_active_heatmap()
 
-    # カラーマップを定義
-    colorscale = [
-        [0, "lightblue"],   # 値 0 の色
-        [0.5, "blue"],      # 値 1 の色
-        [1, "orange"],      # 値 2 の色
-    ]
 
-    # ヒートマップ作成
-    fig = go.Figure(data=go.Heatmap(
-        z=df.values,
-        x=df.columns,
-        y=df.index,
-        colorscale=colorscale,
-        showscale=False  # カラーバーを非表示
-    ))
+    # カテゴリーに対応する色を設定
+    category_colors = {
+        '就寝': 'blue',       # 青
+        '室外': 'orange',     # オレンジ
+        '室内': 'lightblue'   # 水色
+    }
 
-    # レイアウトの調整
-    fig.update_layout(
-        xaxis_title="時間",
-        font=dict(color="black"),
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        height=300,
-        margin=dict(t=40, b=40, l=40, r=40)
+    # 2. データの前処理
+    df['最新の一ヶ月の日付'] = pd.to_datetime(df['最新の一ヶ月の日付'], format="%Y-%m-%d") 
+
+    # 日付を文字列に変換（表示のため）
+    df['日付_str'] = df['最新の一ヶ月の日付'].dt.strftime('%Y-%m-%d')
+
+    # ピボットテーブルを作成（行：日付、列：時刻、値：カテゴリー）
+    pivot_table = df.pivot(index='日付_str', columns='時刻(hour)', values='カテゴリー')
+
+    # 日付を降順に並べ替え（最新の日付が上になるように）
+    pivot_table = pivot_table.iloc[::-1]
+
+    # カテゴリーを数値にマッピング
+    category_mapping = {'就寝': 0, '室内': 1, '室外': 2}
+    heatmap_data = pivot_table.replace(category_mapping)
+
+    # 3. ヒートマップの作成
+
+    # カスタムカラースケールを定義
+    colorscale = ['blue', 'lightblue', 'orange']
+
+    # ヒートマップを作成
+    fig = px.imshow(
+        heatmap_data,
+        labels=dict(x='時刻(hour)', y='日付', color='カテゴリー'),
+        x=heatmap_data.columns,
+        y=heatmap_data.index,
+        color_continuous_scale=colorscale,
+        aspect='auto'
     )
+
+    # カラーバーの設定
+    fig.update_coloraxes(
+        colorbar=dict(
+            tickvals=[0, 1, 2],
+            ticktext=['就寝', '室内', '室外']
+        ),
+        cmin=0,
+        cmax=2,
+        showscale=False  # カラーバーを非表示にする場合は True を False に変更
+    )
+
+    # x軸の設定（時刻を整数表示）
+    fig.update_xaxes(
+        dtick=1,
+        tickmode='linear'
+    )
+
+    # y軸の設定
+    fig.update_yaxes(
+        tickmode='linear'
+    )
+
+    # レイアウトの更新
+    fig.update_layout(
+        title='最新の一ヶ月のカテゴリー別ヒートマップ',
+        xaxis_title='時刻(hour)',
+        yaxis_title='日付',
+        yaxis_autorange='reversed'  # y軸を逆順にする
+    )
+
+    # 4. 結果の表示
     
     return fig
 
@@ -552,10 +593,6 @@ def rader_chart():
     categories = df["カテゴリー"].tolist()  # カテゴリ名
     values = df["スコア"].tolist()  # 各カテゴリの値
 
-
-    print(categories)
-    print(values)
-    
     # categories = ["睡眠時間", "活動時間", "睡眠リズム", "バイタルパターン"]  # カテゴリ名
     # values = [4, 3, 5, 4]  # 各カテゴリの値
 
@@ -597,12 +634,13 @@ def rader_chart():
 
 def donut_chart():
     
+    df = data.donut_chart()
     # データ定義
-    labels = ["部屋", "就寝", "外出", "ベット内"]
-    values = [55, 30, 10, 5]
+    labels = df["カテゴリー"].tolist()
+    values = df["外出"].tolist()
 
     # カラースケール
-    colors = ["skyblue", "darkblue", "orange", "limegreen"]
+    colors = ["orange", "darkblue", "limegreen", "skyblue"]
 
     # ドーナツチャートを作成
     fig = go.Figure(data=[go.Pie(
@@ -635,7 +673,7 @@ def donut_chart():
 def time_log():
 
     df = data.record()
-    st.dataframe(df, use_container_width=True)
+    st.dataframe(df, use_container_width=True,hide_index=True)
 
 
 

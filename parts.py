@@ -34,14 +34,11 @@ def display_large_number(number, unit="", percentage=None):
 
 
 # 大きな数値と割合を表示する関数
-def display_large_number_family(number, unit="", percentage=None):
-    percentage_text = f'<p class="percentage-text">{percentage}</p>' if percentage else ''
-    unit_text = f'<span class="small-text"> {unit}</span>' if unit else ''
+def display_large_number_family(hour, minute, unit):
     st.markdown(
         f"""
         <div class="custom-container">
-            <p class="large-number-family">{number}{unit_text}</p>
-            {percentage_text}
+            <p class="large-number-family">{hour}<span style="font-size:18px;">　{unit}　</span>{minute}<span style="font-size:18px;">　分　</span></p>
         </div>
         """,
         unsafe_allow_html=True,
