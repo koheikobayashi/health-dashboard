@@ -91,7 +91,7 @@ def create_weekly_boxplot(identifier):
 
     selected_metric = st.selectbox(
         "",
-        options=["心拍数", "呼吸数"],
+        options=["呼吸数","心拍数"],
         index=0,
         key=selectbox_key
     )
@@ -132,23 +132,13 @@ def sleep_time():
     """
     df = data.get_today_yesterday_sleep_active()
 
-    categories = ["昨日", "今日"]
+    categories = ["今日","昨日"]
     sleep_hours = [df.at[0, "昨日の睡眠時間"], df.at[0, "本日の睡眠時間"]]
     active_hours = [df.at[0, "昨日の活動時間"], df.at[0, "本日の活動時間"]]
 
     fig = go.Figure()
 
-    # 睡眠時間のバー
-    fig.add_trace(go.Bar(
-        x=sleep_hours,
-        y=categories,
-        orientation="h",
-        name="睡眠時間",
-        marker=dict(color="lightblue"),
-        text=sleep_hours,
-        textposition="inside",
-        textfont=dict(color="white", size=14),
-    ))
+
 
     # 活動時間のバー
     fig.add_trace(go.Bar(
@@ -162,9 +152,21 @@ def sleep_time():
         textfont=dict(color="white", size=14),
     ))
 
+        # 睡眠時間のバー
+    fig.add_trace(go.Bar(
+        x=sleep_hours,
+        y=categories,
+        orientation="h",
+        name="睡眠時間",
+        marker=dict(color="lightblue"),
+        text=sleep_hours,
+        textposition="inside",
+        textfont=dict(color="white", size=14),
+    ))
+
     # レイアウトの調整
     fig.update_layout(
-        xaxis=dict(range=[0, 9], showticklabels=False, title="活動時間(h)"),
+        xaxis=dict(range=[0, 9], showticklabels=False),
         yaxis=dict(title=""),
         barmode="group",
         height=200,
@@ -241,6 +243,59 @@ def create_heatmap(df, value_col, title, colorscale, zmax):
     ))
 
     # 各セルに数値を表示
+    # text_values = np.where(
+    #     np.isnan(pivot_table.values),
+    #     "",
+    #     pivot_table.values.astype(int)
+    # )
+
+    # for i, row in enumerate(text_values):
+    #     for j, val in enumerate(row):
+    #         if val != "":
+    #             fig.add_trace(go.Scatter(
+    #                 x=[ordered_columns[j]],
+    #                 y=[pivot_table.index[i]],
+    #                 text=str(val),
+    #                 mode="text",
+    #                 textfont=dict(size=12, color="black"),
+    #                 showlegend=False,
+    #                 hoverinfo="none"
+    #             ))
+
+    # レイアウトの調整
+    fig.update_layout(
+        title=title,
+        font=dict(color="black"),
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        margin=MARGIN,
+        height=HEIGHT,
+    )
+
+    return fig
+
+def create_heatmap_number(df, value_col, title, colorscale, zmax):
+    """
+    ヒートマップを作成する共通関数
+    """
+    pivot_table = df.pivot_table(index="週目", columns="曜日", values=value_col, aggfunc="mean")
+    pivot_table = pivot_table.loc[::-1]  # 週目の順序を逆にする
+
+    ordered_columns = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"]
+    pivot_table = pivot_table[ordered_columns]
+
+    fig = go.Figure(data=go.Heatmap(
+        z=pivot_table.values,
+        x=pivot_table.columns,
+        y=pivot_table.index,
+        colorscale=colorscale,
+        zmin=0,
+        zmax=zmax,
+        hoverongaps=False,
+        showscale=False
+    ))
+
+    # 各セルに数値を表示
     text_values = np.where(
         np.isnan(pivot_table.values),
         "",
@@ -276,13 +331,13 @@ def sleep_heatmap():
     """
     よく眠れている日、そうでない日の可視化をヒートマップで表示する関数
     """
-    df = data.get_monthly_sleep_active()
+    df = data.month_sleep_roomout_heatmap()
     colorscale = [
         [0, "lightgray"],
         [0.01, "lightblue"],
         [1, "deepskyblue"]
     ]
-    fig = create_heatmap(df, "睡眠時間", "", colorscale, zmax=10)
+    fig = create_heatmap(df, "睡眠時間", "週目", colorscale, zmax=500)
     return fig
 
 def fall_down_heatmap():
@@ -296,7 +351,7 @@ def fall_down_heatmap():
         [0.5, "rgb(252,141,89)"],
         [1, "rgb(215,48,39)"]
     ]
-    fig = create_heatmap(df, "転倒検知", "", colorscale, zmax=10)
+    fig = create_heatmap_number(df, "転倒検知", "", colorscale, zmax=10)
     return fig
 
 def distance_graph():
@@ -384,8 +439,25 @@ def anomaly_detect():
     異常検知のログを表示する関数
     """
     df = data.get_alert_log()
+    
+    # 行のハイライト
     styled_log_data = df.style.apply(highlight_danger, axis=1)
-    st.dataframe(styled_log_data, height=400, width=700)
+    
+    # ヘッダーのスタイルを設定
+    styled_log_data = styled_log_data.set_table_styles(
+        [{
+            'selector': 'thead th',
+            'props': [
+                ('background-color', 'orange'),  # ヘッダー背景色
+                ('color', 'white'),             # ヘッダーテキスト色
+                ('font-size', '16px'),          # フォントサイズ
+                ('text-align', 'center')        # テキスト位置
+            ]
+        }]
+    )
+
+    # DataFrameをStreamlitで表示
+    st.dataframe(styled_log_data, height=400, width=700, hide_index=True)
 
 def highlight_danger(row):
     """
@@ -452,7 +524,7 @@ def sleep_or_active_heatmap():
 
     # 2. データの前処理
     df['最新の一ヶ月の日付'] = pd.to_datetime(df['最新の一ヶ月の日付'], format="%Y-%m-%d") 
-    df = df.sort_values(by='最新の一ヶ月の日付',ascending=True)
+    # df = df.sort_values(by='最新の一ヶ月の日付',ascending=True)
 
     # 日付を文字列に変換（表示のため）
     df['日付_str'] = df['最新の一ヶ月の日付'].dt.strftime("%-m/%-d")

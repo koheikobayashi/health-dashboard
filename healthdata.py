@@ -73,6 +73,9 @@ class HealthData:
         self.staff_vital_df = pd.read_csv(
             os.path.join(data_dir, "staff-vital.csv"), encoding='utf-8-sig'
         )
+        self.month_sleep_roomout_heatmap_df = pd.read_csv(
+            os.path.join(data_dir, "month-sleep-roomout-heatmap.csv"), encoding='utf-8-sig'
+        )
 
     
 
@@ -218,3 +221,7 @@ class HealthData:
     # スタッフ用ページのバイタルデータ
     def staff_vital(self):
         return self.staff_vital_df
+    
+    # よく眠れている日、そうでない日の可視化
+    def month_sleep_roomout_heatmap(self):
+        return self.month_sleep_roomout_heatmap_df

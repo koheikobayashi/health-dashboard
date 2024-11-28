@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import graph
 from healthdata import HealthData
+import numpy as np
 
 # ページの設定
 st.set_page_config(page_title="スタッフ様用レイアウト", page_icon=":bar_chart:", layout="wide")
@@ -122,11 +123,11 @@ def display_center_text(text):
 # 大きな数値と割合を表示する関数
 def display_large_number(number, unit="", percentage=None):
     percentage_text = f'<p class="percentage-text">{percentage}</p>' if percentage else ''
-    if percentage_text is "":
+    if percentage:
         if percentage >= 0:
-            percentage_text = '<p class="percentage-text" style="background-color:red">'
+            percentage_text = f'<p class="percentage-text" style="color:green">▼ {np.round(percentage*100,2)}%</p>'
         else:
-            percentage_text = '<p class="percentage-text" style="background-color:green">'
+            percentage_text = f'<p class="percentage-text" style="color:red">▲ {np.round(percentage*100,2)}%</p>'
             
     unit_text = f'<span class="small-text"> {unit}</span>' if unit else ''
     st.markdown(
@@ -147,13 +148,13 @@ data = HealthData()
 staff_vital_df = data.staff_vital()
 heart_rate_increase_decrease = (staff_vital_df.at[0,"今日の心拍数"] - staff_vital_df.at[0,"昨日の心拍数"]) / staff_vital_df.at[0,"昨日の心拍数"]
 
-respiratory_increase_decrease = (staff_vital_df.at[0,"今日の呼吸数"] / staff_vital_df.at[0,"昨日の呼吸数"]) / staff_vital_df.at[0,"昨日の呼吸数"]
+respiratory_increase_decrease = (staff_vital_df.at[0,"今日の呼吸数"] - staff_vital_df.at[0,"昨日の呼吸数"]) / staff_vital_df.at[0,"昨日の呼吸数"]
 
 today_wakeup_time = data.get_today_wakeup_time()
 today_sleep_time = data.get_today_sleep_time()
 
 today_room = data.get_today_room_entry_exit_count()
-today_yesterday_room = data.get_room_entry_exit_change_ratio()
+today_yesterday_room = (staff_vital_df.at[0,"昨日の呼吸数"] - staff_vital_df.at[0,"昨日の心拍数"]) / staff_vital_df.at[0,"昨日の心拍数"]
 
 today_move = data.get_today_movement_distance()
 today_yesterday_move = data.get_movement_distance_change_ratio()
@@ -171,12 +172,12 @@ with col1:
     # リアルタイムの心拍数（左）
     with column_1:
         display_center_text("リアルタイムの心拍数")
-        display_large_number(staff_vital_df.at[0,"今日の心拍数"], unit="", percentage=f"{heart_rate_increase_decrease * 100:.2f}%")
+        display_large_number(staff_vital_df.at[0,"今日の心拍数"], unit="", percentage=heart_rate_increase_decrease)
 
     # リアルタイムの呼吸数（右）
     with column_2:
         display_center_text("リアルタイムの呼吸数")
-        display_large_number(staff_vital_df.at[0,"今日の呼吸数"], unit="", percentage=f"{respiratory_increase_decrease * 100:.2f}%")
+        display_large_number(staff_vital_df.at[0,"今日の呼吸数"], unit="", percentage=respiratory_increase_decrease)
 
     # グラフの表示
     display_center_text("1日の心拍数・呼吸数の推移")
@@ -227,12 +228,12 @@ with col3:
     # 本日の入退室数（左）
     with column_1:
         display_center_text("本日の入退室数")
-        display_large_number(today_room, unit="回", percentage=f"{today_yesterday_room * 100:.2f}%")
+        display_large_number(today_room, unit="回", percentage=today_yesterday_room)
 
     # 本日の移動距離（右）
     with column_2:
         display_center_text("本日の移動距離")
-        display_large_number(today_move, unit="m", percentage=f"{today_yesterday_move * 100:.2f}%")
+        display_large_number(today_move, unit="m")
 
     # グラフの表示
     display_center_text("本日の移動距離の内訳")
