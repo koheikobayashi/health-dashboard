@@ -55,7 +55,6 @@ custom_css = """
     text-align: center;
     font-size: 1em;
     font-weight: bold;
-    color: red;
     margin-top: 0;
 }
 
@@ -123,6 +122,12 @@ def display_center_text(text):
 # 大きな数値と割合を表示する関数
 def display_large_number(number, unit="", percentage=None):
     percentage_text = f'<p class="percentage-text">{percentage}</p>' if percentage else ''
+    if percentage_text is "":
+        if percentage >= 0:
+            percentage_text = '<p class="percentage-text" style="background-color:red">'
+        else:
+            percentage_text = '<p class="percentage-text" style="background-color:green">'
+            
     unit_text = f'<span class="small-text"> {unit}</span>' if unit else ''
     st.markdown(
         f"""
@@ -134,15 +139,15 @@ def display_large_number(number, unit="", percentage=None):
         unsafe_allow_html=True,
     )
 
+
 # データの取得
 data = HealthData()
 
 # ダミーデータの取得
-real_time_heart_rate = data.get_real_time_heart_rate()
-heart_rate_increase_decrease = data.get_heart_rate_change_ratio()
+staff_vital_df = data.staff_vital()
+heart_rate_increase_decrease = (staff_vital_df.at[0,"今日の心拍数"] - staff_vital_df.at[0,"昨日の心拍数"]) / staff_vital_df.at[0,"昨日の心拍数"]
 
-real_time_respiratory_rate = data.get_real_time_respiratory_rate()
-respiratory_increase_decrease = data.get_respiratory_rate_change_ratio()
+respiratory_increase_decrease = (staff_vital_df.at[0,"今日の呼吸数"] / staff_vital_df.at[0,"昨日の呼吸数"]) / staff_vital_df.at[0,"昨日の呼吸数"]
 
 today_wakeup_time = data.get_today_wakeup_time()
 today_sleep_time = data.get_today_sleep_time()
@@ -166,12 +171,12 @@ with col1:
     # リアルタイムの心拍数（左）
     with column_1:
         display_center_text("リアルタイムの心拍数")
-        display_large_number(real_time_heart_rate, unit="", percentage=f"{heart_rate_increase_decrease * 100:.2f}%")
+        display_large_number(staff_vital_df.at[0,"今日の心拍数"], unit="", percentage=f"{heart_rate_increase_decrease * 100:.2f}%")
 
     # リアルタイムの呼吸数（右）
     with column_2:
         display_center_text("リアルタイムの呼吸数")
-        display_large_number(real_time_respiratory_rate, unit="", percentage=f"{respiratory_increase_decrease * 100:.2f}%")
+        display_large_number(staff_vital_df.at[0,"今日の呼吸数"], unit="", percentage=f"{respiratory_increase_decrease * 100:.2f}%")
 
     # グラフの表示
     display_center_text("1日の心拍数・呼吸数の推移")

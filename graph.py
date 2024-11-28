@@ -452,9 +452,10 @@ def sleep_or_active_heatmap():
 
     # 2. データの前処理
     df['最新の一ヶ月の日付'] = pd.to_datetime(df['最新の一ヶ月の日付'], format="%Y-%m-%d") 
+    df = df.sort_values(by='最新の一ヶ月の日付',ascending=True)
 
     # 日付を文字列に変換（表示のため）
-    df['日付_str'] = df['最新の一ヶ月の日付'].dt.strftime('%Y-%m-%d')
+    df['日付_str'] = df['最新の一ヶ月の日付'].dt.strftime("%-m/%-d")
 
     # ピボットテーブルを作成（行：日付、列：時刻、値：カテゴリー）
     pivot_table = df.pivot(index='日付_str', columns='時刻(hour)', values='カテゴリー')
@@ -505,10 +506,10 @@ def sleep_or_active_heatmap():
 
     # レイアウトの更新
     fig.update_layout(
-        title='最新の一ヶ月のカテゴリー別ヒートマップ',
         xaxis_title='時刻(hour)',
-        yaxis_title='日付',
-        yaxis_autorange='reversed'  # y軸を逆順にする
+        yaxis_autorange='reversed',  # y軸を逆順にする
+        height=HEIGHT_FAMILY,
+        margin=MARGIN_FAMILY
     )
 
     # 4. 結果の表示
@@ -520,7 +521,7 @@ def sleep_active_chart():
     # サンプルデータを作成
     df= data.past_week_sleep_time()
 
-    df["最新の一週間分の日付"] = pd.to_datetime(df["最新の一週間分の日付"]).dt.strftime("%-m/%-d")
+    df["最新の一週間分の日付"] = pd.to_datetime(df["最新の一週間分の日付"],format="%Y-%m-%d").dt.strftime("%-m/%-d")
 
     # 平均値を計算
     avg_blue = df["睡眠時間"].mean()
@@ -673,7 +674,7 @@ def donut_chart():
 def time_log():
 
     df = data.record()
-    st.dataframe(df, use_container_width=True,hide_index=True)
+    st.dataframe(df, use_container_width=True,hide_index=True,height=550)
 
 
 

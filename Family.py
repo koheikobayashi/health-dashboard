@@ -19,7 +19,7 @@ family_sleep_time = data.family_sleep_time()
 today_wakeup_active_time_df = data.today_wakeup_active_time()
 
 # ページの設定
-st.set_page_config(page_title="Health Dashboard", page_icon=":bar_chart:", layout="wide")
+st.set_page_config(page_title="ご家族様用ダッシュボード", page_icon=":bar_chart:", layout="wide")
 
 parts.load_css("assets/styles-family.css")
 col1, col2 = st.columns(2)

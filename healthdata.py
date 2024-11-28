@@ -70,6 +70,9 @@ class HealthData:
         self.today_wakeup_active_time_df = pd.read_csv(
             os.path.join(data_dir, "today-wakeup-active-time.csv"), encoding='utf-8-sig'
         )
+        self.staff_vital_df = pd.read_csv(
+            os.path.join(data_dir, "staff-vital.csv"), encoding='utf-8-sig'
+        )
 
     
 
@@ -211,3 +214,7 @@ class HealthData:
     # 起床時間、活動時間
     def today_wakeup_active_time(self):
         return self.today_wakeup_active_time_df
+    
+    # スタッフ用ページのバイタルデータ
+    def staff_vital(self):
+        return self.staff_vital_df
