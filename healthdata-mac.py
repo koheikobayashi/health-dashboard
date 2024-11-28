@@ -1,42 +1,18 @@
 import pandas as pd
-import os
 
 class HealthData:
     def __init__(self):
-        # データディレクトリのパスを設定
-        data_dir = os.path.join('.', 'data')
-        
-        # ダミーデータのインポート（エンコーディングを指定）
-        self.real_time_df = pd.read_csv(
-            os.path.join(data_dir, "realtime.csv"), encoding='utf-8-sig'
-        )
-        self.today_heartrate_respiratory_df = pd.read_csv(
-            os.path.join(data_dir, "todayheart.csv"), encoding='utf-8-sig'
-        )
-        self.week_heartrate_respiratory_df = pd.read_csv(
-            os.path.join(data_dir, "todayheartmax.csv"), encoding='utf-8-sig'
-        )
-        self.today_sleep_active_time_df = pd.read_csv(
-            os.path.join(data_dir, "active.csv"), encoding='utf-8-sig'
-        )
-        self.month_sleep_active_time_df = pd.read_csv(
-            os.path.join(data_dir, "sleep.csv"), encoding='utf-8-sig'
-        )
-        self.today_room_move_df = pd.read_csv(
-            os.path.join(data_dir, "move.csv"), encoding='utf-8-sig'
-        )
-        self.bet_in_out_distance_df = pd.read_csv(
-            os.path.join(data_dir, "todaymove.csv"), encoding='utf-8-sig'
-        )
-        self.week_room_in_out_df = pd.read_csv(
-            os.path.join(data_dir, "room.csv"), encoding='utf-8-sig'
-        )
-        self.fall_down_df = pd.read_csv(
-            os.path.join(data_dir, "fall.csv"), encoding='utf-8-sig'
-        )
-        self.alert_log_df = pd.read_csv(
-            os.path.join(data_dir, "log.csv"), encoding='utf-8-sig'
-        )
+        # ダミーデータのインポート
+        self.real_time_df = pd.read_csv("./data/リアルタイムの心拍数・呼吸数.csv")
+        self.today_heartrate_respiratory_df = pd.read_csv("./data/1日の心拍数・呼吸数の推移.csv")
+        self.week_heartrate_respiratory_df = pd.read_csv("./data/1週間の心拍数・呼吸数の最大値・最小値.csv")
+        self.today_sleep_active_time_df = pd.read_csv("./data/本日・昨日の睡眠・活動時間.csv")
+        self.month_sleep_active_time_df = pd.read_csv("./data/一ヶ月の睡眠時間と活動時間の内訳.csv")
+        self.today_room_move_df = pd.read_csv("./data/本日の入退室数・移動距離.csv")
+        self.bet_in_out_distance_df = pd.read_csv("./data/本日の移動距離の内訳.csv")
+        self.week_room_in_out_df = pd.read_csv("./data/入退室の多い日・時刻.csv")
+        self.fall_down_df = pd.read_csv("./data/転倒検知した日、回数.csv")
+        self.alert_log_df = pd.read_csv("./data/異常検知ログ.csv")
 
     # リアルタイムの心拍数を取得
     def get_real_time_heart_rate(self):
@@ -45,8 +21,7 @@ class HealthData:
     # 昨日の心拍数との比較（増減率）
     def get_heart_rate_change_ratio(self):
         return round(
-            self.real_time_df.at[0, "リアルタイムの心拍数"] /
-            self.real_time_df.at[0, "昨日の心拍数の平均"],
+            self.real_time_df.at[0, "リアルタイムの心拍数"] / self.real_time_df.at[0, "昨日の心拍数の平均"],
             2,
         )
 
@@ -57,8 +32,7 @@ class HealthData:
     # 昨日の呼吸数との比較（増減率）
     def get_respiratory_rate_change_ratio(self):
         return round(
-            self.real_time_df.at[0, "リアルタイムの呼吸数"] /
-            self.real_time_df.at[0, "昨日の呼吸数の平均"],
+            self.real_time_df.at[0, "リアルタイムの呼吸数"] / self.real_time_df.at[0, "昨日の呼吸数の平均"],
             2,
         )
 
@@ -93,8 +67,7 @@ class HealthData:
     # 昨日の入退室数との比較（増減率）
     def get_room_entry_exit_change_ratio(self):
         return round(
-            self.today_room_move_df.at[0, "本日の入退室数"] /
-            self.today_room_move_df.at[0, "昨日の入退室数"],
+            self.today_room_move_df.at[0, "本日の入退室数"] / self.today_room_move_df.at[0, "昨日の入退室数"],
             2,
         )
 
@@ -105,8 +78,7 @@ class HealthData:
     # 昨日の移動距離との比較（増減率）
     def get_movement_distance_change_ratio(self):
         return round(
-            self.today_room_move_df.at[0, "本日の移動距離"] /
-            self.today_room_move_df.at[0, "昨日の移動距離"],
+            self.today_room_move_df.at[0, "本日の移動距離"] / self.today_room_move_df.at[0, "昨日の移動距離"],
             2,
         )
 
@@ -117,8 +89,7 @@ class HealthData:
     # 入退室の多い日・時刻データを取得
     def get_weekly_room_entry_exit(self):
         df = self.week_room_in_out_df.copy()
-        df["日付"] = pd.to_datetime(df["日付"])
-        df["日付_再調整"] = df["日付"].apply(lambda x: f"{x.month}月{x.day}日")
+        df["日付_再調整"] = pd.to_datetime(df["日付"]).dt.strftime("%-m月%d日")
         return df
 
     # 転倒検知した日、回数データを取得

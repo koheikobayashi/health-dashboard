@@ -4,13 +4,17 @@ import plotly.graph_objects as go
 import plotly.io as pio
 import streamlit as st
 from healthdata import HealthData
+import matplotlib.pyplot as plt
 
 # Plotlyのデフォルトテーマをライトモードに設定
 pio.templates.default = "plotly_white"
 
-# グラフの共通設定
+# グラフの設定
 MARGIN = dict(l=40, r=20, t=40, b=40)
 HEIGHT = 350
+
+MARGIN_FAMILY = dict(l=40, r=20, t=20, b=20)
+HEIGHT_FAMILY = 250
 
 data = HealthData()
 
@@ -414,8 +418,124 @@ def heartrate_gauge():
     # レイアウト設定
     fig.update_layout(
         showlegend=False,  # 凡例を非表示
-        margin=dict(t=0, b=0, l=0, r=0),  # マージン設定
-        paper_bgcolor="white"  # 背景色
+        paper_bgcolor='rgba(0,0,0,0)',  # グラフ全体の背景
+        plot_bgcolor='rgba(0,0,0,0)',  # プロット領域の背景
+        margin=MARGIN_FAMILY,
+        height=HEIGHT_FAMILY,
+            xaxis=dict(
+        showgrid=False,  # グリッドラインを非表示
+        zeroline=False,  # ゼロ線を非表示
+        visible=False    # 軸自体を非表示
+    ),
+    yaxis=dict(
+        showgrid=False,  # グリッドラインを非表示
+        zeroline=False,  # ゼロ線を非表示
+        visible=False    # 軸自体を非表示
+    ),
+    )
+
+    return fig
+
+
+def sleep_and_active_heatmap():
+    # サンプルデータの作成
+    dates = ["9/1", "9/2", "9/3", "9/4", "9/5", "9/6"]
+    hours = list(range(24))  # 0時から23時まで
+    data = np.random.choice([0, 1, 2], size=(len(dates), len(hours)), p=[0.6, 0.3, 0.1])
+
+    # データフレーム化
+    df = pd.DataFrame(data, index=dates, columns=hours)
+
+    # カラーマップを定義
+    colorscale = [
+        [0, "lightblue"],   # 値 0 の色
+        [0.5, "blue"],      # 値 1 の色
+        [1, "orange"],      # 値 2 の色
+    ]
+
+    # ヒートマップ作成
+    fig = go.Figure(data=go.Heatmap(
+        z=df.values,
+        x=df.columns,
+        y=df.index,
+        colorscale=colorscale,
+        showscale=False  # カラーバーを非表示
+    ))
+
+    # レイアウトの調整
+    fig.update_layout(
+        xaxis_title="時間",
+        font=dict(color="black"),
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        height=300,
+        margin=dict(t=40, b=40, l=40, r=40)
+    )
+    
+    return fig
+
+
+def sleep_active_chart():
+    # サンプルデータを作成
+    dates = pd.date_range("2023-09-01", periods=7, freq="D").strftime("%m/%d")  # 9/1〜9/7
+    data_blue = [6, 6.76, 6, 7.6, 6.5, 6.8, 6.2]  # 青色データ
+    data_orange = [13, 15, 8.4, 15, 13.5, 12.8, 13.2]  # オレンジ色データ
+
+    # 平均値を計算
+    avg_blue = np.mean(data_blue)
+    avg_orange = np.mean(data_orange)
+
+    # 図を作成
+    fig = go.Figure()
+
+    # 青色のデータ
+    fig.add_trace(go.Scatter(
+        x=dates,
+        y=data_blue,
+        mode="lines+markers+text",
+        name="睡眠時間",
+        line=dict(color="skyblue", width=3),
+        marker=dict(size=8, color="skyblue"),
+        text=[f"{y:.2f}" if y == max(data_blue) else "" for y in data_blue],  # 最大値を表示
+        textfont=dict(color="skyblue", size=14),
+        textposition="top center",
+    ))
+
+    # オレンジ色のデータ
+    fig.add_trace(go.Scatter(
+        x=dates,
+        y=data_orange,
+        mode="lines+markers+text",
+        name="活動時間",
+        line=dict(color="orange", width=3),
+        marker=dict(size=8, color="orange"),
+        text=[f"{y:.2f}" if y == max(data_orange) else "" for y in data_orange],  # 最大値を表示
+        textfont=dict(color="orange", size=14),
+        textposition="top center",
+    ))
+
+    # 平均線を追加
+    fig.add_hline(y=avg_blue, line=dict(color="skyblue", dash="dash"))
+    fig.add_hline(y=avg_orange, line=dict(color="orange", dash="dash"))
+
+    # 平均値のラベルを追加
+    fig.add_annotation(
+        xref="paper", y=avg_blue, x=1.02, yanchor="middle",
+        text=f"{avg_blue:.1f}", showarrow=False, font=dict(color="skyblue")
+    )
+    fig.add_annotation(
+        xref="paper", y=avg_orange, x=1.02, yanchor="middle",
+        text=f"{avg_orange:.1f}", showarrow=False, font=dict(color="orange")
+    )
+
+    # レイアウトを設定
+    fig.update_layout(
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
+        font=dict(color="black"),
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        height=HEIGHT_FAMILY,
+        margin=dict(t=40, b=40, l=40, r=40),
     )
 
     return fig
@@ -454,9 +574,10 @@ def rader_chart():
             )
         ),
         showlegend=False,  # 凡例を非表示
-        margin=dict(t=40, b=20, l=40, r=40),
-        height=400,
-        title=dict(text="バイタルパターン", font=dict(size=16))
+        margin=dict(t=40, b=20, l=60, r=50),
+        height=HEIGHT_FAMILY,
+        paper_bgcolor='rgba(0,0,0,0)',  # グラフ全体の背景
+        plot_bgcolor='rgba(0,0,0,0)',  # プロット領域の背景
     )
     return fig
 
@@ -483,13 +604,84 @@ def donut_chart():
 
     # レイアウトの調整
     fig.update_layout(
-        margin=dict(t=20, b=20, l=20, r=20),
-        height=400,
+        margin=MARGIN_FAMILY,
+        height=HEIGHT_FAMILY,
         annotations=[
             dict(
-                text="総合",
+                text="",
                 x=0.5, y=0.5, font_size=20, showarrow=False  # 中心にテキストを追加
             )
-        ]
+        ],
+        paper_bgcolor='rgba(0,0,0,0)',  # グラフ全体の背景
+        plot_bgcolor='rgba(0,0,0,0)',  # プロット領域の背景
+
     )
     return fig
+
+
+def time_log():
+    # サンプルデータの作成
+    data = {
+        # "お日にち": [
+        #     "9月30日(月)", "9月29日(日)", "9月28日(土)", "9月27日(金)", "9月26日(木)",
+        #     "9月25日(水)", "9月24日(火)", "9月23日(月)", "9月22日(日)", "9月21日(土)"
+        # ],
+        # "テキスト": [
+        #     "本日は体調も良く、穏やかに過ごされました。",
+        #     "睡眠も深く、特に異常はありませんでした。",
+        #     "活動的に過ごされ、心拍数も安定していました。",
+        #     "睡眠時間も十分で、呼吸数も正常範囲でした。",
+        #     "本日は特に異常は見られませんでした。",
+        #     "心拍数がやや高めでしたが、安静で安定しました。",
+        #     "睡眠も深く、特に異常はありませんでした。",
+        #     "活動的に過ごされ、心拍数も安定していました。",
+        #     "睡眠時間も十分で、呼吸数も正常範囲でした。",
+        #     "心拍数がやや高めでしたが、安静で安定しました。"
+        # ],
+        "活動時間": [5, 4, 2, 4, 4, 5, 4, 2, 4, 5],
+        "睡眠時間": [5, 4, 7, 7, 4, 5, 4, 7, 4, 4],
+        "呼吸数": [14, 10, 28, 19, 24, 28, 24, 30, 28, 16],
+        "心拍数平均": [8, 11, 10, 7, 12, 12, 6, 10, 11, 12],
+    }
+
+    # 各列に対応するバーの色を設定
+    colors = {
+        "活動時間": "orange",
+        "睡眠時間": "lightblue",
+        "呼吸数": "yellow",
+        "心拍数平均": "pink"
+    }
+
+    # グラフの初期化
+    fig = go.Figure()
+
+    # 各列を横棒グラフとして追加
+    for i, column in enumerate(data.keys()):
+        fig.add_trace(go.Bar(
+            x=data[column],  # データの値
+            y=[f"行 {j+1}" for j in range(len(data[column]))],  # 行ラベル（仮）
+            orientation='h',  # 横棒グラフ
+            marker=dict(color=colors[column]),  # 色を指定
+            name=column,  # 凡例用の名前
+            showlegend=False,  # 凡例を非表示
+            text=data[column],  # 値を表示
+            textposition="inside"  # 値をバーの内側に表示
+        ))
+
+    # レイアウトの設定
+    fig.update_layout(
+        barmode='stack',  # 横に積み上げるモード
+        yaxis=dict(title="行", showticklabels=False),  # 行のラベルを非表示
+        xaxis=dict(title="値"),
+        height=600,  # グラフ全体の高さ
+        margin=dict(l=100, r=20, t=20, b=20),  # マージン調整
+    )
+
+    # 棒グラフのスタイル調整
+    fig.update_traces(marker_line_width=1.5)
+
+    # グラフを表示
+    return fig
+
+
+

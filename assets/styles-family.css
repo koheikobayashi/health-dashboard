@@ -1,6 +1,6 @@
 /* 全体の背景色 */
 .stMainBlockContainer{
-  background-color: #DEDEDE;
+  background-color: #F6F6F6;
 }
 /* ヘッダーのスタイル */
 .styled-header, .styled-header2 {
@@ -59,12 +59,23 @@
 
 /* カスタムコンテナ */
 .custom-container {
-  background-color: #f9f9f9; /* 背景色 */
-  border: 1px solid #ddd;   /* 枠線 */
+  background-color: #F2F2E8; /* 背景色 */
   text-align: center;       /* テキストを中央揃え */
-  background-color: white;
   margin: 0 10px;
   padding: 10px;
+}
+
+.record-container{
+  padding: 10px; /* 内側の余白を追加 */
+  margin-top: 15px; /* 下部の余白を広げる */
+  border-radius: 5px;
+  border: 1px solid #ddd; /* 薄い境界線を追加 */
+}
+
+.record {
+  font-family: 'Arial', sans-serif;
+  font-size: 1em;
+  margin: 10px 0;
 }
 
 div[data-testid="stVerticalBlockBorderWrapper"]{
@@ -72,7 +83,7 @@ div[data-testid="stVerticalBlockBorderWrapper"]{
 }
           
 .stVerticalBlock > div[data-testid="stVerticalBlockBorderWrapper"]:last-child {
-  background-color: #FAFAFA;
+  background-color: #F2F2E8;
   margin: 0;
 }
 
@@ -80,7 +91,7 @@ div[data-testid="stVerticalBlockBorderWrapper"]{
 [data-testid="stColumn"] {
   width: calc(33.33% - 1rem) !important;
   flex: 1 1 calc(33.33% - 1rem) !important;
-  background-color: #FAFAFA;
+  background-color: #F2F2E8;
 }
 @media (max-width: 1500px) {
   [data-testid="stColumn"] {

@@ -31,3 +31,18 @@ def display_large_number(number, unit="", percentage=None):
         """,
         unsafe_allow_html=True,
     )
+
+
+# 大きな数値と割合を表示する関数
+def display_large_number_family(number, unit="", percentage=None):
+    percentage_text = f'<p class="percentage-text">{percentage}</p>' if percentage else ''
+    unit_text = f'<span class="small-text"> {unit}</span>' if unit else ''
+    st.markdown(
+        f"""
+        <div class="custom-container">
+            <p class="large-number-family">{number}{unit_text}</p>
+            {percentage_text}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
