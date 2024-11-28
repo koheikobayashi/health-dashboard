@@ -620,68 +620,10 @@ def donut_chart():
 
 
 def time_log():
-    # サンプルデータの作成
-    data = {
-        # "お日にち": [
-        #     "9月30日(月)", "9月29日(日)", "9月28日(土)", "9月27日(金)", "9月26日(木)",
-        #     "9月25日(水)", "9月24日(火)", "9月23日(月)", "9月22日(日)", "9月21日(土)"
-        # ],
-        # "テキスト": [
-        #     "本日は体調も良く、穏やかに過ごされました。",
-        #     "睡眠も深く、特に異常はありませんでした。",
-        #     "活動的に過ごされ、心拍数も安定していました。",
-        #     "睡眠時間も十分で、呼吸数も正常範囲でした。",
-        #     "本日は特に異常は見られませんでした。",
-        #     "心拍数がやや高めでしたが、安静で安定しました。",
-        #     "睡眠も深く、特に異常はありませんでした。",
-        #     "活動的に過ごされ、心拍数も安定していました。",
-        #     "睡眠時間も十分で、呼吸数も正常範囲でした。",
-        #     "心拍数がやや高めでしたが、安静で安定しました。"
-        # ],
-        "活動時間": [5, 4, 2, 4, 4, 5, 4, 2, 4, 5],
-        "睡眠時間": [5, 4, 7, 7, 4, 5, 4, 7, 4, 4],
-        "呼吸数": [14, 10, 28, 19, 24, 28, 24, 30, 28, 16],
-        "心拍数平均": [8, 11, 10, 7, 12, 12, 6, 10, 11, 12],
-    }
 
-    # 各列に対応するバーの色を設定
-    colors = {
-        "活動時間": "orange",
-        "睡眠時間": "lightblue",
-        "呼吸数": "yellow",
-        "心拍数平均": "pink"
-    }
+    df = data.record()
+    st.dataframe(df, use_container_width=True)
 
-    # グラフの初期化
-    fig = go.Figure()
-
-    # 各列を横棒グラフとして追加
-    for i, column in enumerate(data.keys()):
-        fig.add_trace(go.Bar(
-            x=data[column],  # データの値
-            y=[f"行 {j+1}" for j in range(len(data[column]))],  # 行ラベル（仮）
-            orientation='h',  # 横棒グラフ
-            marker=dict(color=colors[column]),  # 色を指定
-            name=column,  # 凡例用の名前
-            showlegend=False,  # 凡例を非表示
-            text=data[column],  # 値を表示
-            textposition="inside"  # 値をバーの内側に表示
-        ))
-
-    # レイアウトの設定
-    fig.update_layout(
-        barmode='stack',  # 横に積み上げるモード
-        yaxis=dict(title="行", showticklabels=False),  # 行のラベルを非表示
-        xaxis=dict(title="値"),
-        height=600,  # グラフ全体の高さ
-        margin=dict(l=100, r=20, t=20, b=20),  # マージン調整
-    )
-
-    # 棒グラフのスタイル調整
-    fig.update_traces(marker_line_width=1.5)
-
-    # グラフを表示
-    return fig
 
 
 

@@ -20,7 +20,7 @@ class HealthData:
             os.path.join(data_dir, "active.csv"), encoding='utf-8-sig'
         )
         self.month_sleep_active_time_df = pd.read_csv(
-            os.path.join(data_dir, "sleep.csv"), encoding='utf-8-sig'
+            os.path.join(data_dir, "week_sleep.csv"), encoding='utf-8-sig'
         )
         self.today_room_move_df = pd.read_csv(
             os.path.join(data_dir, "move.csv"), encoding='utf-8-sig'
@@ -37,6 +37,26 @@ class HealthData:
         self.alert_log_df = pd.read_csv(
             os.path.join(data_dir, "log.csv"), encoding='utf-8-sig'
         )
+        self.today_move_log_df = pd.read_csv(
+            os.path.join(data_dir, "today_move_log.csv"), encoding='utf-8-sig'
+        )
+        self.vital_pattern_df = pd.read_csv(
+            os.path.join(data_dir, "vitalpattern.csv"), encoding='utf-8-sig'
+        )
+        self.health_score_df = pd.read_csv(
+            os.path.join(data_dir, "vitalpattern.csv"), encoding='utf-8-sig'
+        )
+        self.live_log_df = pd.read_csv(
+            os.path.join(data_dir, "vitalpattern.csv"), encoding='utf-8-sig'
+        )
+        self.family_sleep_active_time_df = pd.read_csv(
+            os.path.join(data_dir, "family_sleep_active_time.csv"), encoding='utf-8-sig'
+        )
+        self.record_df = pd.read_csv(
+            os.path.join(data_dir, "record.csv"), encoding='utf-8-sig'
+        )
+
+    
 
     # リアルタイムの心拍数を取得
     def get_real_time_heart_rate(self):
@@ -128,3 +148,31 @@ class HealthData:
     # 異常検知ログデータを取得
     def get_alert_log(self):
         return self.alert_log_df.copy()
+
+    # 本日の行動記録
+    def today_move_log(self):
+        return self.today_move_log_df.at[0, "テキスト"]
+    
+    # バイタルパターンのテキスト
+    def vital_pattern_log(self):
+        return self.vital_pattern_df.at[0, "テキスト"]
+
+    # 健康スコアのテキスト
+    def health_score_log(self):
+        return self.health_score_df.at[0, "テキスト"]
+    
+    # 施設で過ごされ方のテキスト
+    def live_log(self):
+        return self.live_log_df.at[0, "テキスト"]
+    
+    # 今日の活動時間
+    def family_active_time(self):
+        return self.family_sleep_active_time_df.at[0, "今日の活動時間"]
+
+    # 今日の睡眠時間
+    def family_sleep_time(self):
+        return self.family_sleep_active_time_df.at[0, "今日の睡眠時間"]
+    
+    # 施設での過ごされ方のレコード
+    def record(self):
+        return self.record_df

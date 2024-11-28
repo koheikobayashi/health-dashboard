@@ -9,6 +9,12 @@ data = HealthData()
 
 # ダミーデータの取得
 today_sleep_time = data.get_today_sleep_time()
+today_move_log = data.today_move_log()
+vital_pattern_log = data.vital_pattern_log()
+health_score_log = data.health_score_log()
+live_log = data.live_log()
+family_active_time = data.family_active_time()
+family_sleep_time = data.family_sleep_time()
 
 # ページの設定
 st.set_page_config(page_title="Health Dashboard", page_icon=":bar_chart:", layout="wide")
@@ -29,7 +35,7 @@ with col1:
 
     with column_2:
       parts.display_center_text("活動時間")
-      parts.display_large_number("8時32分", unit="")
+      parts.display_large_number(family_active_time, unit="")
 
     column_1, column_2 = st.columns(2)
 
@@ -40,9 +46,11 @@ with col1:
 
     with column_2:
       parts.display_center_text("本日の行動記録")
-      st.markdown("""
+
+  
+      st.markdown(f"""
           <div class="record-container" style="background-color:#FCFFEA;">
-              <div class="record">午前8:32分　起床されました。<br>午前9:15分　外出されました。<br>午後4:32分　自室に戻られました。<br>午後9:32分　ベッドに入られました。</div>
+              <div class="record">{today_move_log}</div>
           </div>
       """, unsafe_allow_html=True)
 
@@ -54,7 +62,7 @@ with col1:
     column_1, column_2 = st.columns(2)
 
     with column_1:
-      parts.display_center_text("就寝時間")
+      parts.display_center_text("就寝時刻")
       parts.display_large_number(today_sleep_time, unit="")
 
     with column_2:
@@ -74,9 +82,9 @@ with col1:
       st.plotly_chart(fig3, use_container_width=True, config={"displayModeBar": False})
 
     with column_2:
-      st.markdown("""
+      st.markdown(f"""
           <div class="record-container" style="background-color:#E8F6FF;">
-              <div class="record">午前8:32分　起床されました。<br>午前9:15分　外出されました。<br>午後4:32分　自室に戻られました。<br>午後9:32分　ベッドに入られました。</div>
+              <div class="record">{vital_pattern_log}</div>
           </div>
       """, unsafe_allow_html=True)
 
@@ -93,9 +101,9 @@ with col2:
             st.plotly_chart(fig4, use_container_width=True, config={"displayModeBar": False})
 
           with column_2:
-              st.markdown("""
+              st.markdown(f"""
                   <div class="record-container" style="background-color:#FFF39A;">
-                      <div class="record">午前8:32分　起床されました。<br>午前9:15分　外出されました。<br>午後4:32分　自室に戻られました。<br>午後9:32分　ベッドに入られました。</div>
+                      <div class="record">{health_score_log}</div>
                   </div>
               """, unsafe_allow_html=True)
 
@@ -116,5 +124,4 @@ with col2:
         st.plotly_chart(fig5, use_container_width=True, config={"displayModeBar": False})
 
     parts.display_center_text("今月の活動記録")
-    fig6 = graph.time_log()
-    st.plotly_chart(fig6, use_container_width=True, config={"displayModeBar": False})
+    graph.time_log()
