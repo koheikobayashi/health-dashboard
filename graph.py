@@ -477,39 +477,39 @@ def sleep_and_active_heatmap():
 
 def sleep_active_chart():
     # サンプルデータを作成
-    dates = pd.date_range("2023-09-01", periods=7, freq="D").strftime("%m/%d")  # 9/1〜9/7
-    data_blue = [6, 6.76, 6, 7.6, 6.5, 6.8, 6.2]  # 青色データ
-    data_orange = [13, 15, 8.4, 15, 13.5, 12.8, 13.2]  # オレンジ色データ
+    df= data.past_week_sleep_time()
+
+    df["最新の一週間分の日付"] = pd.to_datetime(df["最新の一週間分の日付"]).dt.strftime("%-m/%-d")
 
     # 平均値を計算
-    avg_blue = np.mean(data_blue)
-    avg_orange = np.mean(data_orange)
+    avg_blue = df["睡眠時間"].mean()
+    avg_orange = df["活動時間（室外時間）"].mean()
 
     # 図を作成
     fig = go.Figure()
 
     # 青色のデータ
     fig.add_trace(go.Scatter(
-        x=dates,
-        y=data_blue,
+        x=df["最新の一週間分の日付"],
+        y=df["睡眠時間"],
         mode="lines+markers+text",
         name="睡眠時間",
         line=dict(color="skyblue", width=3),
         marker=dict(size=8, color="skyblue"),
-        text=[f"{y:.2f}" if y == max(data_blue) else "" for y in data_blue],  # 最大値を表示
+        text=[f"{y:.2f}" if y == df["睡眠時間"].max() else "" for y in df["睡眠時間"]],  # 最大値を表示
         textfont=dict(color="skyblue", size=14),
         textposition="top center",
     ))
 
     # オレンジ色のデータ
     fig.add_trace(go.Scatter(
-        x=dates,
-        y=data_orange,
+        x=df["最新の一週間分の日付"],
+        y=df["活動時間（室外時間）"],
         mode="lines+markers+text",
         name="活動時間",
         line=dict(color="orange", width=3),
         marker=dict(size=8, color="orange"),
-        text=[f"{y:.2f}" if y == max(data_orange) else "" for y in data_orange],  # 最大値を表示
+        text=[f"{y:.2f}" if y == df["活動時間（室外時間）"].max() else "" for y in df["活動時間（室外時間）"]],  # 最大値を表示
         textfont=dict(color="orange", size=14),
         textposition="top center",
     ))
@@ -534,8 +534,13 @@ def sleep_active_chart():
         font=dict(color="black"),
         paper_bgcolor="white",
         plot_bgcolor="white",
-        height=HEIGHT_FAMILY,
+        height=200,
         margin=dict(t=40, b=40, l=40, r=40),
+        xaxis=dict(
+        tickmode="array",
+        tickvals=df["最新の一週間分の日付"],
+        ticktext=df["最新の一週間分の日付"]  # 日付を「9/1, 9/2」形式で表示
+        ),
     )
 
     return fig
@@ -543,8 +548,16 @@ def sleep_active_chart():
 
 def rader_chart():
     # データの定義
-    categories = ["睡眠時間", "活動時間", "睡眠リズム", "バイタルパターン"]  # カテゴリ名
-    values = [4, 3, 5, 4]  # 各カテゴリの値
+    df = data.rader_chart()
+    categories = df["カテゴリー"].tolist()  # カテゴリ名
+    values = df["スコア"].tolist()  # 各カテゴリの値
+
+
+    print(categories)
+    print(values)
+    
+    # categories = ["睡眠時間", "活動時間", "睡眠リズム", "バイタルパターン"]  # カテゴリ名
+    # values = [4, 3, 5, 4]  # 各カテゴリの値
 
     # レーダーチャート用のデータを作成
     values += values[:1]  # 閉じるために最初の値を最後に追加

@@ -55,6 +55,15 @@ class HealthData:
         self.record_df = pd.read_csv(
             os.path.join(data_dir, "record.csv"), encoding='utf-8-sig'
         )
+        self.sleep_and_active_heatmap_df = pd.read_csv(
+            os.path.join(data_dir, "sleep-active-heatmap.csv"), encoding='utf-8-sig'
+        )
+        self.past_week_sleep_time_df = pd.read_csv(
+            os.path.join(data_dir, "past-week-sleep-time.csv"), encoding='utf-8-sig'
+        )
+        self.rader_chart_df = pd.read_csv(
+            os.path.join(data_dir, "rader-chart.csv"), encoding='utf-8-sig'
+        )
 
     
 
@@ -176,3 +185,16 @@ class HealthData:
     # 施設での過ごされ方のレコード
     def record(self):
         return self.record_df
+    
+    # 睡眠時間、室内、室外
+    def sleep_and_active_heatmap(self):
+        return self.sleep_and_active_heatmap_df
+    
+
+    # rader_chart
+    def past_week_sleep_time(self):
+        return self.past_week_sleep_time_df
+    
+    # レーダーチャート
+    def rader_chart(self):
+        return self.rader_chart_df

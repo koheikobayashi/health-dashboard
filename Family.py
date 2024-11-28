@@ -9,6 +9,7 @@ data = HealthData()
 
 # ダミーデータの取得
 today_sleep_time = data.get_today_sleep_time()
+today_wakeup_time = data.get_today_wakeup_time()
 today_move_log = data.today_move_log()
 vital_pattern_log = data.vital_pattern_log()
 health_score_log = data.health_score_log()
@@ -31,7 +32,7 @@ with col1:
 
     with column_1:
       parts.display_center_text("起床時間")
-      parts.display_large_number_family("8時32分", unit="")
+      parts.display_large_number_family(today_wakeup_time, unit="")
 
     with column_2:
       parts.display_center_text("活動時間")
