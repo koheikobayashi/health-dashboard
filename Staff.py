@@ -8,7 +8,7 @@ import parts
 # ページの設定
 st.set_page_config(page_title="スタッフ様用レイアウト", page_icon=":bar_chart:", layout="wide")
 
-parts.load_css("assets/styles-family.css")
+parts.load_css("assets/styles.css")
 
 # ヘッダーを表示する関数
 def display_header(title, bg_color):
