@@ -159,7 +159,7 @@ class HealthData:
     def get_weekly_room_entry_exit(self):
         df = self.week_room_in_out_df.copy()
         # df["日付"] = pd.to_datetime(df["日付"]).dt.strftime("%-m/%-d")
-        df["日付"] = pd.to_datetime(df["日付"],format="%Y-%m-%d").dt.strftime("%m/%d")
+        df["日付"] = pd.to_datetime(df["日付"],format="%Y-%m-%d").dt.strftime("%-m/%d")
         df["日付_再調整"] = df["日付"]#.apply(lambda x: f"{x.month}月{x.day}日")
         return df
 

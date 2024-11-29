@@ -180,8 +180,10 @@ def sleep_active_area():
     """
     1ヶ月の睡眠時間と活動時間の内訳をエリアチャートで表示する関数
     """
+
     df = data.get_monthly_sleep_active()
-    dates = df["日付"]
+    df["日付_再計算"] = pd.to_datetime(df["日付"],format="%Y-%m-%d").dt.strftime("%-m/%-d")
+    dates = df["日付_再計算"]
     sleep_hours = df["睡眠時間"]
     active_hours = df["活動時間"]
 
@@ -440,6 +442,7 @@ def anomaly_detect():
     異常検知のログを表示する関数
     """
     df = data.get_alert_log()
+    df = df.sort_values(by=["時刻"],ascending=False)
     
     # 行のハイライト
     styled_log_data = df.style.apply(highlight_danger, axis=1)
