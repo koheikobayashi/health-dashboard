@@ -3,112 +3,12 @@ import pandas as pd
 import graph
 from healthdata import HealthData
 import numpy as np
+import parts
 
 # ページの設定
 st.set_page_config(page_title="スタッフ様用レイアウト", page_icon=":bar_chart:", layout="wide")
 
-# カスタムCSSの定義
-custom_css = """
-<style>
-/* 全体の背景色 */
-.stMainBlockContainer{
-    background-color: #DEDEDE;
-}
-/* ヘッダーのスタイル */
-.styled-header, .styled-header2 {
-    text-align: center;
-    font-size: 2em;
-    font-weight: bold;
-    color: white;
-    margin-top: 10px;
-    margin-bottom: 0;
-}
-
-.styled-header2 {
-    margin: 10px 10px 0 10px;
-}
-
-/* センターテキストのスタイル */
-.center-text {
-    text-align: center;
-    font-size: 0.9em;
-    font-weight: bold;
-    margin: 10px 5px;
-    background-color: white;
-}
-
-/* 大きな数値表示のスタイル */
-.large-number {
-    text-align: center;
-    font-size: 3em;
-    font-weight: bold;
-    margin: 0px 10px;
-}
-
-/* 小さなテキストのスタイル */
-.small-text {
-    font-size: 24px;
-    font-weight: normal;
-}
-
-/* 割合表示のスタイル */
-.percentage-text {
-    text-align: center;
-    font-size: 1em;
-    font-weight: bold;
-    margin-top: 0;
-}
-
-/* カスタムコンテナ */
-.custom-container {
-    background-color: #f9f9f9; /* 背景色 */
-    border: 1px solid #ddd;   /* 枠線 */
-    text-align: center;       /* テキストを中央揃え */
-    background-color: white;
-    margin: 0 10px;
-    padding: 10px;
-}
-
-div[data-testid="stVerticalBlockBorderWrapper"]{
-    margin: 0px 10px;
-}
-            
-.stVerticalBlock > div[data-testid="stVerticalBlockBorderWrapper"]:last-child {
-    background-color: #FAFAFA;
-    margin: 0;
-}
- 
-/* カラムのレスポンシブデザイン */
-[data-testid="stColumn"] {
-    width: calc(33.33% - 1rem) !important;
-    flex: 1 1 calc(33.33% - 1rem) !important;
-    background-color: #FAFAFA;
-}
-@media (max-width: 1700px) {
-    [data-testid="stColumn"] {
-        width: calc(33.33% - 1rem) !important;
-    }
-}
-@media (max-width: 1550px) {
-    [data-testid="stColumn"] {
-        width: calc(50% - 1rem) !important;
-    }
-}
-@media (max-width: 1070px) {
-    [data-testid="stColumn"] {
-        width: calc(100% - 1rem) !important;
-    }
-}
-
-/* ツールバーやフッターの非表示 */
-#MainMenu, header, footer, div[data-testid="stToolbar"], div[data-testid="stDecoration"] {
-    visibility: hidden;
-    height: 0;
-    position: fixed;
-}
-</style>
-"""
-st.markdown(custom_css, unsafe_allow_html=True)
+parts.load_css("assets/styles-family.css")
 
 # ヘッダーを表示する関数
 def display_header(title, bg_color):
