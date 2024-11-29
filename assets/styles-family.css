@@ -98,12 +98,12 @@ div[data-testid="stVerticalBlockBorderWrapper"]{
       width: calc(33.33% - 1rem) !important;
   }
 }
-@media (max-width: 1350px) {
+@media (max-width: 1450px) {
   [data-testid="stColumn"] {
       width: calc(50% - 1rem) !important;
   }
 }
-@media (max-width: 1250px) {
+@media (max-width: 1350px) {
   [data-testid="stColumn"] {
       width: calc(100% - 1rem) !important;
   }

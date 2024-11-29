@@ -428,6 +428,7 @@ def room_heatmap():
         font=dict(color="black"),
         paper_bgcolor="white",
         plot_bgcolor="white",
+        yaxis_autorange=True,
         margin=MARGIN,
         height=HEIGHT
     )
@@ -524,7 +525,7 @@ def sleep_or_active_heatmap():
 
     # 2. データの前処理
     df['最新の一ヶ月の日付'] = pd.to_datetime(df['最新の一ヶ月の日付'], format="%Y-%m-%d") 
-    # df = df.sort_values(by='最新の一ヶ月の日付',ascending=True)
+    df = df.sort_values(by='最新の一ヶ月の日付',ascending=False)
 
     # 日付を文字列に変換（表示のため）
     df['日付_str'] = df['最新の一ヶ月の日付'].dt.strftime("%-m/%-d")
@@ -579,7 +580,7 @@ def sleep_or_active_heatmap():
     # レイアウトの更新
     fig.update_layout(
         xaxis_title='時刻(hour)',
-        yaxis_autorange='reversed',  # y軸を逆順にする
+        yaxis_autorange=True,  # y軸を逆順にする
         height=HEIGHT_FAMILY,
         margin=MARGIN_FAMILY
     )
@@ -593,7 +594,7 @@ def sleep_active_chart():
     # サンプルデータを作成
     df= data.past_week_sleep_time()
 
-    df["最新の一週間分の日付"] = pd.to_datetime(df["最新の一週間分の日付"],format="%Y-%m-%d").dt.strftime("%-m/%-d")
+    df["日付"] = pd.to_datetime(df["最新の一週間分の日付"],format="%Y-%m-%d").dt.strftime("%-m/%-d")
 
     # 平均値を計算
     avg_blue = df["睡眠時間"].mean()
@@ -604,7 +605,7 @@ def sleep_active_chart():
 
     # 青色のデータ
     fig.add_trace(go.Scatter(
-        x=df["最新の一週間分の日付"],
+        x=df["日付"],
         y=df["睡眠時間"],
         mode="lines+markers+text",
         name="睡眠時間",
@@ -617,7 +618,7 @@ def sleep_active_chart():
 
     # オレンジ色のデータ
     fig.add_trace(go.Scatter(
-        x=df["最新の一週間分の日付"],
+        x=df["日付"],
         y=df["活動時間（室外時間）"],
         mode="lines+markers+text",
         name="活動時間",

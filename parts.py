@@ -38,7 +38,7 @@ def display_large_number_family(hour, minute, unit):
     st.markdown(
         f"""
         <div class="custom-container">
-            <p class="large-number-family">{hour}<span style="font-size:18px;">　{unit}　</span>{minute}<span style="font-size:18px;">　分　</span></p>
+            <p class="large-number-family">{hour}<span style="font-size:18px;">　{unit}　</span>{minute}<span style="font-size:14px;">　分</span></p>
         </div>
         """,
         unsafe_allow_html=True,
